@@ -3,3 +3,4 @@ app
 config
 .idea
 composer.lock
+skeleton

@@ -33,4 +33,45 @@ class Application
 
 EOL;
     }
+
+    public static function println($strings)
+    {
+        echo $strings . PHP_EOL;
+    }
+
+    public static function echoSuccess($msg)
+    {
+        self::println("[" . date("Y-m-d H:i:s") . "] [INFO] " . "\033[32m{$msg}\033[0m");
+    }
+
+    public static function echoError($msg)
+    {
+        self::println("[" . date("Y-m-d H:i:s") . "] [ERROR] " . "\033[31m{$msg}\033[0m");
+    }
+
+    public static function run()
+    {
+        self::welcome();
+        global $argv;
+        $count = count($argv);
+        $funcName = $argv[$count - 1];
+        $command = explode(":", $funcName);
+        switch ($command[0]) {
+            case 'http':
+                $className = \Simps\Server\HTTP::class;
+                break;
+            case 'ws':
+                $className = \Simps\Server\WebSocket::class;
+                break;
+            default:
+                self::echoError("use $argv[0] [http:start, ws:start]");
+        }
+        switch ($command[1]) {
+            case 'start':
+                new $className;
+                break;
+            default:
+                self::echoError("use $argv[0] [http:start, ws:start]");
+        }
+    }
 }

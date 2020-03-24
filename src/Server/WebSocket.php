@@ -48,8 +48,7 @@ class WebSocket
 
     public function onStart(\Swoole\Server $server)
     {
-        Application::welcome();
-        echo "Swoole WebSocket Server running：ws://{$this->_config['ip']}:{$this->_config['port']}" . PHP_EOL;
+        Application::echoSuccess("Swoole WebSocket Server running：ws://{$this->_config['ip']}:{$this->_config['port']}");
         Listener::getInstance()->listen('start', $server);
     }
 

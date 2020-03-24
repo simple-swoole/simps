@@ -12,4 +12,4 @@ error_reporting(E_ALL);
 
 require BASE_PATH . '/vendor/autoload.php';
 
-new Simps\Server\WebSocket();
+Simps\Application::run();

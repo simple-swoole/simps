@@ -41,8 +41,7 @@ class HTTP
 
     public function onStart(\Swoole\Server $server)
     {
-        Application::welcome();
-        echo "Swoole Http Server running：http://{$this->_config['ip']}:{$this->_config['port']}" . PHP_EOL;
+        Application::echoSuccess("Swoole Http Server running：http://{$this->_config['ip']}:{$this->_config['port']}");
         Listener::getInstance()->listen('start', $server);
     }
 
