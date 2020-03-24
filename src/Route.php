@@ -15,8 +15,6 @@ use function FastRoute\simpleDispatcher;
 
 class Route
 {
-    use Singleton;
-
     private static $instance;
 
     private static $config;
