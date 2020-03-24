@@ -64,7 +64,7 @@ EOL;
                 $className = \Simps\Server\WebSocket::class;
                 break;
             default:
-                self::echoError("use $argv[0] [http:start, ws:start]");
+                exit(self::echoError("use $argv[0] [http:start, ws:start]"));
         }
         switch ($command[1]) {
             case 'start':
