@@ -61,17 +61,20 @@ class WebSocket
 
     public function onOpen(Server $server, $request)
     {
-        echo "server: handshake success with fd{$request->fd}\n";
+        Listener::getInstance()->listen('open', $server, $request);
+//        echo "server: handshake success with fd{$request->fd}\n";
     }
 
     public function onMessage(Server $server, $frame)
     {
-        echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
-        $server->push($frame->fd, 'this is server');
+        Listener::getInstance()->listen('message', $server, $frame);
+//        echo "receive from {$frame->fd}:{$frame->data},opcode:{$frame->opcode},fin:{$frame->finish}\n";
+//        $server->push($frame->fd, 'this is server');
     }
 
     public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
-        $this->_route->dispatch($request, $response);
+        Listener::getInstance()->listen('message', $request, $response);
+//        $this->_route->dispatch($request, $response);
     }
 }

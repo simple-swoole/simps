@@ -24,13 +24,15 @@
         "friendsofphp/php-cs-fixer": "^2.9"
     },
     "bin": [
-        "bin/simps"
+        "bin/simps.php"
     ],
     "autoload": {
         "psr-4": {
             "Simps\\": "src/"
         },
-        "files": ["src/functions.php"]
+        "files": [
+            "src/functions.php"
+        ]
     },
     "config": {
         "sort-packages": true
