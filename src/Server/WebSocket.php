@@ -40,9 +40,7 @@ class WebSocket
         $this->_server->on('message', [$this, 'onmessage']);
 //        $this->_server->on('handShake', [$this, 'onHandShake']);
         $this->_server->on('request', [$this, 'onRequest']);
-        $this->_server->on('close', function ($ser, $fd) {
-            echo "client {$fd} closed\n";
-        });
+        $this->_server->on('close', [$this, 'onClose']);
         $this->_server->start();
     }
 
@@ -75,5 +73,10 @@ class WebSocket
     {
         Listener::getInstance()->listen('message', $request, $response);
 //        $this->_route->dispatch($request, $response);
+    }
+
+    public function onClose(Server $server, $fd)
+    {
+        Listener::getInstance()->listen('close',  $server, $fd);
     }
 }

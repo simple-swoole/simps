@@ -43,13 +43,10 @@ class Route
     }
 
     /**
-     * 根据method及uri调用对应配置的类.
-     * @param string $method
-     * @param string $uri
-     * @param mixed $request
-     * @param mixed $response
+     * @param $request
+     * @param $response
+     * @return mixed|string
      * @throws \Exception
-     * @return string
      */
     public function dispatch($request, $response)
     {
@@ -114,11 +111,11 @@ class Route
     }
 
     /**
-     * @param string $uri
-     * @param mixed $request
-     * @param mixed $response
+     * @param $request
+     * @param $response
+     * @param $uri
+     * @return mixed
      * @throws \Exception
-     * @return string
      */
     public function defaultRouter($request, $response, $uri)
     {
