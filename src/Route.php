@@ -45,8 +45,8 @@ class Route
     /**
      * @param $request
      * @param $response
-     * @return mixed|string
      * @throws \Exception
+     * @return mixed|string
      */
     public function dispatch($request, $response)
     {
@@ -100,11 +100,11 @@ class Route
                     //invoke controller and get result
                     return $controller->{$func}($request, $response, $vars ?? null);
                 }
-                    if (is_callable($handler)) {
-                        //call direct when router define an callable function
-                        return call_user_func_array($handler, [$request, $response, $vars ?? null]);
-                    }
-                        throw new \Exception('Router Config error on handle.' . $uri, -108);
+                if (is_callable($handler)) {
+                    //call direct when router define an callable function
+                    return call_user_func_array($handler, [$request, $response, $vars ?? null]);
+                }
+                throw new \Exception('Router Config error on handle.' . $uri, -108);
                 break;
         }
         throw new \Exception('Unknow Fast Router decide ' . $uri, -101);
@@ -114,8 +114,8 @@ class Route
      * @param $request
      * @param $response
      * @param $uri
-     * @return mixed
      * @throws \Exception
+     * @return mixed
      */
     public function defaultRouter($request, $response, $uri)
     {

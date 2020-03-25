@@ -77,6 +77,6 @@ class WebSocket
 
     public function onClose(Server $server, $fd)
     {
-        Listener::getInstance()->listen('close',  $server, $fd);
+        Listener::getInstance()->listen('close', $server, $fd);
     }
 }

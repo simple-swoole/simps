@@ -1,8 +1,12 @@
 <?php
+
+declare(strict_types=1);
 /**
- * User: lufei
- * Date: 2020/3/24
- * Email: lufei@swoole.com
+ * This file is part of Simps.
+ *
+ * @link     https://swoole.com
+ * @document https://wiki.swoole.com
+ * @license  https://github.com/sy-records/simps/blob/master/LICENSE
  */
 
 namespace Simps;
@@ -11,9 +15,9 @@ trait Singleton
 {
     private static $instance;
 
-    static function getInstance(...$args)
+    public static function getInstance(...$args)
     {
-        if(!isset(self::$instance)){
+        if (! isset(self::$instance)) {
             self::$instance = new static(...$args);
         }
         return self::$instance;

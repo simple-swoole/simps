@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Simps\DB;
 
-class BaseModel
+class BaseRedis
 {
     protected $pool;
 
@@ -19,19 +19,11 @@ class BaseModel
 
     public function __construct()
     {
-        $config = config('database', []);
+        $config = config('redis', []);
         if (! empty($config)) {
-            switch ($config['drive']) {
-                case 'mysqli':
-                    $class = MySQLi::class;
-                    break;
-                case 'pdo':
-                    $class = PDO::class;
-                    break;
-            }
+            $this->pool = getInstance(Redis::class);
+            $this->connection = $this->pool->getConnection();
         }
-        $this->pool = getInstance($class);
-        $this->connection = $this->pool->getConnection();
     }
 
     public function __call($name, $arguments)

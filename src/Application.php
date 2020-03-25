@@ -41,12 +41,12 @@ EOL;
 
     public static function echoSuccess($msg)
     {
-        self::println("[" . date("Y-m-d H:i:s") . "] [INFO] " . "\033[32m{$msg}\033[0m");
+        self::println('[' . date('Y-m-d H:i:s') . '] [INFO] ' . "\033[32m{$msg}\033[0m");
     }
 
     public static function echoError($msg)
     {
-        self::println("[" . date("Y-m-d H:i:s") . "] [ERROR] " . "\033[31m{$msg}\033[0m");
+        self::println('[' . date('Y-m-d H:i:s') . '] [ERROR] ' . "\033[31m{$msg}\033[0m");
     }
 
     public static function run()
@@ -55,7 +55,7 @@ EOL;
         global $argv;
         $count = count($argv);
         $funcName = $argv[$count - 1];
-        $command = explode(":", $funcName);
+        $command = explode(':', $funcName);
         switch ($command[0]) {
             case 'http':
                 $className = \Simps\Server\HTTP::class;
@@ -64,14 +64,14 @@ EOL;
                 $className = \Simps\Server\WebSocket::class;
                 break;
             default:
-                exit(self::echoError("use $argv[0] [http:start, ws:start]"));
+                exit(self::echoError("use {$argv[0]} [http:start, ws:start]"));
         }
         switch ($command[1]) {
             case 'start':
-                new $className;
+                new $className();
                 break;
             default:
-                self::echoError("use $argv[0] [http:start, ws:start]");
+                self::echoError("use {$argv[0]} [http:start, ws:start]");
         }
     }
 }
