@@ -62,7 +62,11 @@ class Redis
 
     public function getConnection()
     {
-        return $this->pools->get();
+        $redis = $this->pools->get();
+        defer(function () use ($redis) {
+            $this->close($redis);
+        });
+        return $redis;
     }
 
     public function close($connection = null)
