@@ -77,6 +77,6 @@ class MySQLi
 
     public function close($connection = null)
     {
-        return $this->pools->put($connection);
+        $this->pools->put($connection);
     }
 }
