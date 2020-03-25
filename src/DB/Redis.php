@@ -63,7 +63,7 @@ class Redis
     public function getConnection()
     {
         $redis = $this->pools->get();
-        defer(function () use ($redis) {
+        \Swoole\Coroutine::defer(function () use ($redis) {
             $this->close($redis);
         });
         return $redis;

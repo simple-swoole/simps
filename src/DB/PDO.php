@@ -69,7 +69,7 @@ class PDO
     public function getConnection()
     {
         $pdo = $this->pools->get();
-        defer(function () use ($pdo) {
+        \Swoole\Coroutine::defer(function () use ($pdo) {
             $this->close($pdo);
         });
         return $pdo;

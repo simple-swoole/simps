@@ -69,7 +69,7 @@ class MySQLi
     public function getConnection()
     {
         $mysqli = $this->pools->get();
-        defer(function () use ($mysqli) {
+        \Swoole\Coroutine::defer(function () use ($mysqli) {
             $this->close($mysqli);
         });
         return $mysqli;
