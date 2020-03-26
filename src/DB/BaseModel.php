@@ -14,13 +14,16 @@ namespace Simps\DB;
 class BaseModel
 {
     protected $pool;
-
+    /** @var \PDO | \mysqli */
     protected $connection;
+
+    private $drive;
 
     public function __construct()
     {
         $config = config('database', []);
         if (! empty($config)) {
+            $this->drive = $config['drive'];
             switch ($config['drive']) {
                 case 'mysqli':
                     $class = MySQLi::class;
@@ -37,5 +40,33 @@ class BaseModel
     public function __call($name, $arguments)
     {
         return $this->connection->{$name}(...$arguments);
+    }
+
+    public function beginTransaction()
+    {
+        if ($this->drive == "pdo") {
+            $this->connection->beginTransaction();
+        } else {
+            $this->connection->autocommit(false);
+        }
+        $this->connection->is_transaction = true;
+    }
+
+    public function commit()
+    {
+        $this->connection->commit();
+        if ($this->drive == "mysqli") {
+            $this->connection->autocommit(true);
+        }
+        $this->connection->is_transaction = false;
+    }
+
+    public function rollBack()
+    {
+        $this->connection->rollBack();
+        if ($this->drive == "mysqli") {
+            $this->connection->autocommit(true);
+        }
+        $this->connection->is_transaction = false;
     }
 }

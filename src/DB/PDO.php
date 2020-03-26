@@ -51,10 +51,10 @@ class PDO
         }
     }
 
-    public function __call($name, $arguments)
-    {
-        return $this->getConnection()->{$name}(...$arguments);
-    }
+//    public function __call($name, $arguments)
+//    {
+//        return $this->getConnection()->{$name}(...$arguments);
+//    }
 
     public static function getInstance($config = null)
     {
@@ -72,6 +72,10 @@ class PDO
     {
         $pdo = $this->pools->get();
         \Swoole\Coroutine::defer(function () use ($pdo) {
+            if ($pdo->is_transaction) {
+                $pdo->rollBack();
+                $pdo->is_transaction = false;
+            }
             $this->close($pdo);
         });
         return $pdo;

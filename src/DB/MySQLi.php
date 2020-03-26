@@ -49,10 +49,10 @@ class MySQLi
         }
     }
 
-    public function __call($name, $arguments)
-    {
-        return $this->getConnection()->{$name}(...$arguments);
-    }
+//    public function __call($name, $arguments)
+//    {
+//        return $this->getConnection()->{$name}(...$arguments);
+//    }
 
     public static function getInstance($config = null)
     {
@@ -70,6 +70,10 @@ class MySQLi
     {
         $mysqli = $this->pools->get();
         \Swoole\Coroutine::defer(function () use ($mysqli) {
+            if ($mysqli->is_transaction) {
+                $mysqli->rollback();
+                $mysqli->is_transaction = false;
+            }
             $this->close($mysqli);
         });
         return $mysqli;
