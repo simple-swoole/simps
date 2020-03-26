@@ -31,11 +31,15 @@ class HTTP
         $httpConfig = $config['http'];
         $this->_config = $httpConfig;
         $this->_server = new Server($httpConfig['ip'], $httpConfig['port'], $config['mode'], $httpConfig['sock_type']);
-        $this->_server->set($httpConfig['setting']);
+        $this->_server->set($httpConfig['settings']);
 
         $this->_server->on('start', [$this, 'onStart']);
         $this->_server->on('workerStart', [$this, 'onWorkerStart']);
         $this->_server->on('request', [$this, 'onRequest']);
+        foreach ($httpConfig['callbacks'] as $eventKey => $callbackItem) {
+            list($class, $func) = $callbackItem;
+            $this->_server->on($eventKey, [$class, $func]);
+        }
         $this->_server->start();
     }
 
