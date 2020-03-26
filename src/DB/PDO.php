@@ -29,6 +29,7 @@ class PDO
         'username' => 'root',
         'password' => 'root',
         'charset' => 'utf8mb4',
+        'options' => [],
     ];
 
     private static $instance;
@@ -45,6 +46,7 @@ class PDO
                     ->withCharset($this->config['charset'])
                     ->withUsername($this->config['username'])
                     ->withPassword($this->config['password'])
+                    ->withOptions($this->config['options'] ?? [])
             );
         }
     }
