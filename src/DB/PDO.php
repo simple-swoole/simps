@@ -72,7 +72,7 @@ class PDO
     {
         $pdo = $this->pools->get();
         \Swoole\Coroutine::defer(function () use ($pdo) {
-            if ($pdo->is_transaction) {
+            if (@$pdo->is_transaction) {
                 $pdo->rollBack();
                 $pdo->is_transaction = false;
             }

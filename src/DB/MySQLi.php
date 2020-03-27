@@ -70,7 +70,7 @@ class MySQLi
     {
         $mysqli = $this->pools->get();
         \Swoole\Coroutine::defer(function () use ($mysqli) {
-            if ($mysqli->is_transaction) {
+            if (@$mysqli->is_transaction) {
                 $mysqli->rollback();
                 $mysqli->is_transaction = false;
             }
