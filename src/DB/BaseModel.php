@@ -4,9 +4,9 @@ declare(strict_types=1);
 /**
  * This file is part of Simps.
  *
- * @link     https://swoole.com
- * @document https://wiki.swoole.com
- * @license  https://github.com/sy-records/simps/blob/master/LICENSE
+ * @link     https://simps.io
+ * @document https://doc.simps.io
+ * @license  https://github.com/simple-swoole/simps/blob/master/LICENSE
  */
 
 namespace Simps\DB;
@@ -14,6 +14,7 @@ namespace Simps\DB;
 class BaseModel
 {
     protected $pool;
+
     /** @var \PDO | \mysqli */
     protected $connection;
 
@@ -44,7 +45,7 @@ class BaseModel
 
     public function beginTransaction()
     {
-        if ($this->drive == "pdo") {
+        if ($this->drive == 'pdo') {
             $this->connection->beginTransaction();
         } else {
             $this->connection->autocommit(false);
@@ -55,7 +56,7 @@ class BaseModel
     public function commit()
     {
         $this->connection->commit();
-        if ($this->drive == "mysqli") {
+        if ($this->drive == 'mysqli') {
             $this->connection->autocommit(true);
         }
         $this->connection->is_transaction = false;
@@ -64,7 +65,7 @@ class BaseModel
     public function rollBack()
     {
         $this->connection->rollBack();
-        if ($this->drive == "mysqli") {
+        if ($this->drive == 'mysqli') {
             $this->connection->autocommit(true);
         }
         $this->connection->is_transaction = false;

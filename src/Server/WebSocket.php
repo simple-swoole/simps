@@ -4,9 +4,9 @@ declare(strict_types=1);
 /**
  * This file is part of Simps.
  *
- * @link     https://swoole.com
- * @document https://wiki.swoole.com
- * @license  https://github.com/sy-records/simps/blob/master/LICENSE
+ * @link     https://simps.io
+ * @document https://doc.simps.io
+ * @license  https://github.com/simple-swoole/simps/blob/master/LICENSE
  */
 
 namespace Simps\Server;
@@ -41,7 +41,7 @@ class WebSocket
 //        $this->_server->on('request', [$this, 'onRequest']);
 //        $this->_server->on('close', [$this, 'onClose']);
         foreach ($wsConfig['callbacks'] as $eventKey => $callbackItem) {
-            list($class, $func) = $callbackItem;
+            [$class, $func] = $callbackItem;
             $this->_server->on($eventKey, [$class, $func]);
         }
         $this->_server->start();
