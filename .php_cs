@@ -3,9 +3,9 @@
 $header = <<<'EOF'
 This file is part of Simps.
 
-@link     https://swoole.com
-@document https://wiki.swoole.com
-@license  https://github.com/sy-records/simps/blob/master/LICENSE
+@link     https://simps.io
+@document https://doc.simps.io
+@license  https://github.com/simple-swoole/simps/blob/master/LICENSE
 EOF;
 
 return PhpCsFixer\Config::create()
