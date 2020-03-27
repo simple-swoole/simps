@@ -4,9 +4,9 @@ declare(strict_types=1);
 /**
  * This file is part of Simps.
  *
- * @link     https://swoole.com
- * @document https://wiki.swoole.com
- * @license  https://github.com/sy-records/simps/blob/master/LICENSE
+ * @link     https://simps.io
+ * @document https://doc.simps.io
+ * @license  https://github.com/simple-swoole/simps/blob/master/LICENSE
  */
 
 namespace Simps\DB;
@@ -72,7 +72,7 @@ class PDO
     {
         $pdo = $this->pools->get();
         \Swoole\Coroutine::defer(function () use ($pdo) {
-            if ($pdo->is_transaction) {
+            if (@$pdo->is_transaction) {
                 $pdo->rollBack();
                 $pdo->is_transaction = false;
             }
