@@ -24,9 +24,6 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.9"
     },
-    "bin": [
-        "bin/simps.php"
-    ],
     "autoload": {
         "psr-4": {
             "Simps\\": "src/"
@@ -42,4 +39,3 @@
         "cs-fix": "php-cs-fixer fix $1"
     }
 }
-
