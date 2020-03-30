@@ -33,7 +33,12 @@ class WebSocket
         $this->_server = new Server($wsConfig['ip'], $wsConfig['port'], $config['mode']);
         $this->_server->set($wsConfig['settings']);
 
-        $this->_server->on('start', [$this, 'onStart']);
+        if ($config['mode'] == SWOOLE_BASE) {
+            $this->_server->on('managerStart', [$this, 'onManagerStart']);
+        } else {
+            $this->_server->on('start', [$this, 'onStart']);
+        }
+
         $this->_server->on('workerStart', [$this, 'onWorkerStart']);
         foreach ($wsConfig['callbacks'] as $eventKey => $callbackItem) {
             [$class, $func] = $callbackItem;
@@ -46,6 +51,12 @@ class WebSocket
     {
         Application::echoSuccess("Swoole WebSocket Server running：ws://{$this->_config['ip']}:{$this->_config['port']}");
         Listener::getInstance()->listen('start', $server);
+    }
+
+    public function onManagerStart(\Swoole\Server $server)
+    {
+        Application::echoSuccess("Swoole WebSocket Server running：ws://{$this->_config['ip']}:{$this->_config['port']}");
+        Listener::getInstance()->listen('managerStart', $server);
     }
 
     public function onWorkerStart(\Swoole\Server $server, int $workerId)
