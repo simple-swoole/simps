@@ -33,7 +33,8 @@
         ]
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "optimize-autoloader": true
     },
     "scripts": {
         "cs-fix": "php-cs-fixer fix $1"
