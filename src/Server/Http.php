@@ -40,6 +40,7 @@ class Http
                 $config['mode'],
                 $httpConfig['sock_type']
             );
+            $this->_server->on('workerStart', [$this, 'onWorkerStart']);
             $this->_server->on('request', [$this, 'onRequest']);
         }
         $this->_server->set($httpConfig['settings']);
@@ -50,7 +51,6 @@ class Http
             $this->_server->on('start', [$this, 'onStart']);
         }
 
-        $this->_server->on('workerStart', [$this, 'onWorkerStart']);
         foreach ($httpConfig['callbacks'] as $eventKey => $callbackItem) {
             [$class, $func] = $callbackItem;
             $this->_server->on($eventKey, [$class, $func]);
