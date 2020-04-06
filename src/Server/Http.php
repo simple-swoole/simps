@@ -15,8 +15,9 @@ use Simps\Application;
 use Simps\Listener;
 use Simps\Route;
 use Swoole\Http\Server;
+use Swoole\Server as HttpServer;
 
-class HTTP
+class Http
 {
     protected $_server;
 
@@ -30,7 +31,17 @@ class HTTP
         $config = config('servers');
         $httpConfig = $config['http'];
         $this->_config = $httpConfig;
-        $this->_server = new Server($httpConfig['ip'], $httpConfig['port'], $config['mode'], $httpConfig['sock_type']);
+        if ($httpConfig['settings']['only_simple_http'] ?? false) {
+            $this->_server = new HttpServer($httpConfig['ip'], $httpConfig['port'], $config['mode']);
+        } else {
+            $this->_server = new Server(
+                $httpConfig['ip'],
+                $httpConfig['port'],
+                $config['mode'],
+                $httpConfig['sock_type']
+            );
+            $this->_server->on('request', [$this, 'onRequest']);
+        }
         $this->_server->set($httpConfig['settings']);
 
         if ($config['mode'] == SWOOLE_BASE) {
@@ -40,7 +51,6 @@ class HTTP
         }
 
         $this->_server->on('workerStart', [$this, 'onWorkerStart']);
-        $this->_server->on('request', [$this, 'onRequest']);
         foreach ($httpConfig['callbacks'] as $eventKey => $callbackItem) {
             [$class, $func] = $callbackItem;
             $this->_server->on($eventKey, [$class, $func]);
@@ -48,19 +58,19 @@ class HTTP
         $this->_server->start();
     }
 
-    public function onStart(\Swoole\Server $server)
+    public function onStart(HttpServer $server)
     {
         Application::echoSuccess("Swoole Http Server running：http://{$this->_config['ip']}:{$this->_config['port']}");
         Listener::getInstance()->listen('start', $server);
     }
 
-    public function onManagerStart(\Swoole\Server $server)
+    public function onManagerStart(HttpServer $server)
     {
         Application::echoSuccess("Swoole Http Server running：http://{$this->_config['ip']}:{$this->_config['port']}");
         Listener::getInstance()->listen('managerStart', $server);
     }
 
-    public function onWorkerStart(\Swoole\Server $server, int $workerId)
+    public function onWorkerStart(HttpServer $server, int $workerId)
     {
         $this->_route = Route::getInstance();
         Listener::getInstance()->listen('workerStart', $server, $workerId);
