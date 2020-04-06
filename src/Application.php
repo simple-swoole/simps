@@ -58,7 +58,7 @@ EOL;
         $command = explode(':', $funcName);
         switch ($command[0]) {
             case 'http':
-                $className = \Simps\Server\HTTP::class;
+                $className = \Simps\Server\Http::class;
                 break;
             case 'ws':
                 $className = \Simps\Server\WebSocket::class;
