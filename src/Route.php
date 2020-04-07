@@ -19,8 +19,6 @@ class Route
 
     private static $config;
 
-    private static $staticConfig;
-
     private static $dispatcher = null;
 
     private function __construct()
@@ -32,16 +30,7 @@ class Route
         if (is_null(self::$instance)) {
             self::$instance = new self();
 
-            $config = Config::getInstance()->get('routes');
-            if(isset($config['static'])) {
-                self::$staticConfig = self::$config['static'];
-                unset($config['static']);
-            }
-            if(isset($config['dynamic'])) {
-                self::$config = $config['dynamic'];
-            } else {
-                self::$config = $config;
-            }
+            self::$config = Config::getInstance()->get('routes');
             self::$dispatcher = simpleDispatcher(
                 function (\FastRoute\RouteCollector $routerCollector) {
                     foreach (self::$config as $routerDefine) {
@@ -63,29 +52,6 @@ class Route
     {
         $method = $request->server['request_method'] ?? 'GET';
         $uri = $request->server['request_uri'] ?? '/';
-
-        //直接匹配
-        /**
-         * [
-         *  '/' => ['GET', 'index@index'],
-         *  '/user' => ['GET', function($req, $rsp) {
-         *          $rsp->end('user');
-         *   }]
-         * ]
-         */
-        $sr = self::$staticConfig;
-        if (!empty($sr)) {
-            if (isset($sr[$uri])) { //找到方法
-                if ($method == $sr[$uri][0]) {
-                    if (is_callable($sr[$uri][1])) {
-                        return $sr[$uri][1]($request, $response);
-                    }
-                    return $this->run($sr[$uri][1], $request, $response, $uri);
-                }
-                throw new \Exception('Request Method Not Allowed', 405);
-            }
-        }
-
         $routeInfo = self::$dispatcher->dispatch($method, $uri);
 
         //result status decide
@@ -107,7 +73,32 @@ class Route
                 //string rule is controllerName@functionName
                 if (is_string($handler)) {
                     //decode handle setting
-                    return $this->run($handler, $request, $response, $uri);
+                    $handler = explode('@', $handler);
+                    if (count($handler) != 2) {
+                        throw new \Exception(
+                            'Router Config error on handle.Handle only support two parameter with @' . $uri,
+                            -105
+                        );
+                    }
+
+                    $className = $handler[0];
+                    $func = $handler[1];
+
+                    //class check
+                    if (! class_exists($className)) {
+                        throw new \Exception("Router {$uri} Handle definded Class Not Found", -106);
+                    }
+
+                    //new controller
+                    $controller = new $className();
+
+                    //method check
+                    if (! method_exists($controller, $func)) {
+                        throw new \Exception("Router {$uri} Handle definded {$func} Method Not Found", -107);
+                    }
+
+                    //invoke controller and get result
+                    return $controller->{$func}($request, $response, $vars ?? null);
                 }
                 if (is_callable($handler)) {
                     //call direct when router define an callable function
@@ -117,36 +108,6 @@ class Route
                 break;
         }
         throw new \Exception('Unknow Fast Router decide ' . $uri, -101);
-    }
-
-    public function run($handler, $request, $response, $uri)
-    {
-        $handler = explode('@', $handler);
-        if (count($handler) != 2) {
-            throw new \Exception(
-                'Router Config error on handle.Handle only support two parameter with @' . $uri,
-                -105
-            );
-        }
-
-        $className = $handler[0];
-        $func = $handler[1];
-
-        //class check
-        if (! class_exists($className)) {
-            throw new \Exception("Router {$uri} Handle definded Class Not Found", -106);
-        }
-
-        //new controller
-        $controller = new $className();
-
-        //method check
-        if (! method_exists($controller, $func)) {
-            throw new \Exception("Router {$uri} Handle definded {$func} Method Not Found", -107);
-        }
-
-        //invoke controller and get result
-        return $controller->{$func}($request, $response, $vars ?? null);
     }
 
     /**
