@@ -14,9 +14,9 @@ namespace Simps\Server;
 use Simps\Application;
 use Simps\Listener;
 use Simps\Route;
+use Simps\Server\Protocol\HTTP\SimpleRoute;
 use Swoole\Http\Server;
 use Swoole\Server as HttpServer;
-use Simps\Server\Protocol\HTTP\SimpleRoute;
 
 class Http
 {
@@ -36,7 +36,6 @@ class Http
             $this->_server = new HttpServer($httpConfig['ip'], $httpConfig['port'], $config['mode']);
             $this->_server->on('workerStart', [$this, 'onSimpleWorkerStart']);
             $this->_server->on('receive', [$this, 'onReceive']);
-
         } else {
             $this->_server = new Server(
                 $httpConfig['ip'],

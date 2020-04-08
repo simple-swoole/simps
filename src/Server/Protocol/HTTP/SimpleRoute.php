@@ -21,7 +21,7 @@ class SimpleRoute
     private static $config;
 
     private static $dispatcher = null;
-    
+
     private static $cache = [];
 
     private function __construct()
@@ -49,8 +49,8 @@ class SimpleRoute
      * @param $server
      * @param $fd
      * @param $data
-     * @return mixed
      * @throws \Exception
+     * @return mixed
      */
     public function dispatch($server, $fd, $data)
     {
@@ -70,19 +70,18 @@ class SimpleRoute
             case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
                 //$allowedMethods = $routeInfo[1];
                 // ... 405 Method Not Allowed
-                $server->send($fd, SimpleResponse::build("", 405));
+                $server->send($fd, SimpleResponse::build('', 405));
                 throw new \Exception('Request Method Not Allowed', 405);
                 break;
             case \FastRoute\Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
-                
-                
-                if(isset(self::$cache[$handler])){
+
+                if (isset(self::$cache[$handler])) {
                     $cache_entity = self::$cache[$handler];
-                    return $cache_entity[0]->{$cache_entity[1]}($request, $response, $vars ?? null);
+                    return $cache_entity[0]->{$cache_entity[1]}($server, $fd, $vars ?? null);
                 }
-                
+
                 //string rule is controllerName@functionName
                 if (is_string($handler)) {
                     //decode handle setting
@@ -98,7 +97,7 @@ class SimpleRoute
                     $func = $handlerArr[1];
 
                     //class check
-                    if (!class_exists($className)) {
+                    if (! class_exists($className)) {
                         throw new \Exception("Router {$uri} Handle definded Class Not Found", -106);
                     }
 
@@ -106,11 +105,11 @@ class SimpleRoute
                     $controller = new $className();
 
                     //method check
-                    if (!method_exists($controller, $func)) {
+                    if (! method_exists($controller, $func)) {
                         throw new \Exception("Router {$uri} Handle definded {$func} Method Not Found", -107);
                     }
 
-                    self::$cache[$handler] = array( $controller, $func );
+                    self::$cache[$handler] = [$controller, $func];
                     //invoke controller and get result
                     return $controller->{$func}($server, $fd, $vars ?? null);
                 }
@@ -128,8 +127,8 @@ class SimpleRoute
      * @param $server
      * @param $fd
      * @param $uri
-     * @return mixed
      * @throws \Exception
+     * @return mixed
      */
     public function defaultRouter($server, $fd, $uri)
     {
@@ -146,10 +145,10 @@ class SimpleRoute
                 return $className->index($server, $fd);
             }
             //找不到404
-            $server->send($fd, SimpleResponse::build("", 404));
+            $server->send($fd, SimpleResponse::build('', 404));
             throw new \Exception('Default Router index/index Handle define Class Not Found', 404);
         }
-        $server->send($fd, SimpleResponse::build("", 404));
+        $server->send($fd, SimpleResponse::build('', 404));
         throw new \Exception('Router Not Found', 404);
     }
 }
