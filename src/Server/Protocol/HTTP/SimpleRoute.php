@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 /**
  * This file is part of Simps.
  *
@@ -16,15 +16,16 @@ use function FastRoute\simpleDispatcher;
 
 class SimpleRoute
 {
-
     private static $instance;
+
     private static $config;
+
     private static $dispatcher = null;
+
     private static $cache = [];
 
     private function __construct()
     {
-        
     }
 
     public static function getInstance()
@@ -34,11 +35,11 @@ class SimpleRoute
 
             self::$config = Config::getInstance()->get('routes');
             self::$dispatcher = simpleDispatcher(
-                    function (\FastRoute\RouteCollector $routerCollector) {
-                foreach (self::$config as $routerDefine) {
-                    $routerCollector->addRoute($routerDefine[0], $routerDefine[1], $routerDefine[2]);
+                function (\FastRoute\RouteCollector $routerCollector) {
+                    foreach (self::$config as $routerDefine) {
+                        $routerCollector->addRoute($routerDefine[0], $routerDefine[1], $routerDefine[2]);
+                    }
                 }
-            }
             );
         }
         return self::$instance;
@@ -77,7 +78,8 @@ class SimpleRoute
                     $handlerArr = explode('@', $handler);
                     if (count($handlerArr) != 2) {
                         throw new \Exception(
-                        'Router Config error on handle.Handle only support two parameter with @' . $uri, -105
+                            'Router Config error on handle.Handle only support two parameter with @' . $uri,
+                            -105
                         );
                     }
 
@@ -85,7 +87,7 @@ class SimpleRoute
                     $func = $handlerArr[1];
 
                     //class check
-                    if (!class_exists($className)) {
+                    if (! class_exists($className)) {
                         throw new \Exception("Router {$uri} Handle definded Class Not Found", -106);
                     }
 
@@ -93,7 +95,7 @@ class SimpleRoute
                     $controller = new $className();
 
                     //method check
-                    if (!method_exists($controller, $func)) {
+                    if (! method_exists($controller, $func)) {
                         throw new \Exception("Router {$uri} Handle definded {$func} Method Not Found", -107);
                     }
 
@@ -150,5 +152,4 @@ class SimpleRoute
         $server->send($fd, SimpleResponse::build('', 404));
         throw new \Exception('Router Not Found', 404);
     }
-
 }
