@@ -21,6 +21,8 @@ class SimpleRoute
     private static $config;
 
     private static $dispatcher = null;
+    
+    private static $cache = [];
 
     private function __construct()
     {
@@ -74,19 +76,26 @@ class SimpleRoute
             case \FastRoute\Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
+                
+                
+                if(isset(self::$cache[$handler])){
+                    $cache_entity = self::$cache[$handler];
+                    return $cache_entity[0]->{$cache_entity[1]}($request, $response, $vars ?? null);
+                }
+                
                 //string rule is controllerName@functionName
                 if (is_string($handler)) {
                     //decode handle setting
-                    $handler = explode('@', $handler);
-                    if (count($handler) != 2) {
+                    $handlerArr = explode('@', $handler);
+                    if (count($handlerArr) != 2) {
                         throw new \Exception(
                             'Router Config error on handle.Handle only support two parameter with @' . $uri,
                             -105
                         );
                     }
 
-                    $className = $handler[0];
-                    $func = $handler[1];
+                    $className = $handlerArr[0];
+                    $func = $handlerArr[1];
 
                     //class check
                     if (!class_exists($className)) {
@@ -101,6 +110,7 @@ class SimpleRoute
                         throw new \Exception("Router {$uri} Handle definded {$func} Method Not Found", -107);
                     }
 
+                    self::$cache[$handler] = array( $controller, $func );
                     //invoke controller and get result
                     return $controller->{$func}($server, $fd, $vars ?? null);
                 }
