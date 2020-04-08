@@ -4,3 +4,4 @@ config
 .idea
 composer.lock
 skeleton
+/nbproject/private/
