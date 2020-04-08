@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 /**
  * This file is part of Simps.
  *
@@ -16,16 +16,15 @@ use function FastRoute\simpleDispatcher;
 
 class SimpleRoute
 {
+
     private static $instance;
-
     private static $config;
-
     private static $dispatcher = null;
-
     private static $cache = [];
 
     private function __construct()
     {
+        
     }
 
     public static function getInstance()
@@ -35,11 +34,11 @@ class SimpleRoute
 
             self::$config = Config::getInstance()->get('routes');
             self::$dispatcher = simpleDispatcher(
-                function (\FastRoute\RouteCollector $routerCollector) {
-                    foreach (self::$config as $routerDefine) {
-                        $routerCollector->addRoute($routerDefine[0], $routerDefine[1], $routerDefine[2]);
-                    }
+                    function (\FastRoute\RouteCollector $routerCollector) {
+                foreach (self::$config as $routerDefine) {
+                    $routerCollector->addRoute($routerDefine[0], $routerDefine[1], $routerDefine[2]);
                 }
+            }
             );
         }
         return self::$instance;
@@ -62,18 +61,8 @@ class SimpleRoute
 
         //result status decide
         switch ($routeInfo[0]) {
-            case \FastRoute\Dispatcher::NOT_FOUND:
-                // ... 404 Not Found
-                //try default router
-                return $this->defaultRouter($server, $fd, $uri);
-                break;
-            case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-                //$allowedMethods = $routeInfo[1];
-                // ... 405 Method Not Allowed
-                $server->send($fd, SimpleResponse::build('', 405));
-                throw new \Exception('Request Method Not Allowed', 405);
-                break;
-            case \FastRoute\Dispatcher::FOUND:
+//            \FastRoute\Dispatcher::FOUND eliminate fetch_cons opline
+            case 1:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
 
@@ -88,8 +77,7 @@ class SimpleRoute
                     $handlerArr = explode('@', $handler);
                     if (count($handlerArr) != 2) {
                         throw new \Exception(
-                            'Router Config error on handle.Handle only support two parameter with @' . $uri,
-                            -105
+                        'Router Config error on handle.Handle only support two parameter with @' . $uri, -105
                         );
                     }
 
@@ -97,7 +85,7 @@ class SimpleRoute
                     $func = $handlerArr[1];
 
                     //class check
-                    if (! class_exists($className)) {
+                    if (!class_exists($className)) {
                         throw new \Exception("Router {$uri} Handle definded Class Not Found", -106);
                     }
 
@@ -105,7 +93,7 @@ class SimpleRoute
                     $controller = new $className();
 
                     //method check
-                    if (! method_exists($controller, $func)) {
+                    if (!method_exists($controller, $func)) {
                         throw new \Exception("Router {$uri} Handle definded {$func} Method Not Found", -107);
                     }
 
@@ -118,6 +106,17 @@ class SimpleRoute
                     return call_user_func_array($handler, [$server, $fd, $vars ?? null]);
                 }
                 throw new \Exception('Router Config error on handle.' . $uri, -108);
+                break;
+            case \FastRoute\Dispatcher::NOT_FOUND:
+                // ... 404 Not Found
+                //try default router
+                return $this->defaultRouter($server, $fd, $uri);
+                break;
+            case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+                //$allowedMethods = $routeInfo[1];
+                // ... 405 Method Not Allowed
+                $server->send($fd, SimpleResponse::build('', 405));
+                throw new \Exception('Request Method Not Allowed', 405);
                 break;
         }
         throw new \Exception('Unknow Fast Router decide ' . $uri, -101);
@@ -151,4 +150,5 @@ class SimpleRoute
         $server->send($fd, SimpleResponse::build('', 404));
         throw new \Exception('Router Not Found', 404);
     }
+
 }
