@@ -20,6 +20,8 @@ class Route
     private static $config;
 
     private static $dispatcher = null;
+    
+    private static $cache = [];
 
     private function __construct()
     {
@@ -70,6 +72,12 @@ class Route
             case \FastRoute\Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
+                
+                if(isset(self::$cache[$handler])){
+                    $cache_entity = self::$cache[$handler];
+                    return $cache_entity[0]->{$cache_entity[1]}($request, $response, $vars ?? null);
+                }
+                
                 //string rule is controllerName@functionName
                 if (is_string($handler)) {
                     //decode handle setting
@@ -97,12 +105,9 @@ class Route
                         throw new \Exception("Router {$uri} Handle definded {$func} Method Not Found", -107);
                     }
 
+                    self::$cache[$handler] = array( $controller, $func );
                     //invoke controller and get result
                     return $controller->{$func}($request, $response, $vars ?? null);
-                }
-                if (is_callable($handler)) {
-                    //call direct when router define an callable function
-                    return call_user_func_array($handler, [$request, $response, $vars ?? null]);
                 }
                 throw new \Exception('Router Config error on handle.' . $uri, -108);
                 break;
