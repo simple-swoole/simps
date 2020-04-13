@@ -45,7 +45,7 @@ class MQTTClient
      * @param array $will 遗嘱消息
      * @return mixed
      */
-    public function connect($clean = true, $will = [])
+    public function connect(bool $clean = true, array $will = [])
     {
         $data = [
             'cmd' => 1,
@@ -73,7 +73,7 @@ class MQTTClient
      * @param array $topics 主题列表
      * @return mixed
      */
-    public function subscribe($topics)
+    public function subscribe(array $topics)
     {
         $data = [
             'cmd' => 8,
@@ -89,7 +89,7 @@ class MQTTClient
      * @param array $topics 主题列表
      * @return mixed
      */
-    public function unSubscribe($topics)
+    public function unSubscribe(array $topics)
     {
         $data = [
             'cmd' => 10,
