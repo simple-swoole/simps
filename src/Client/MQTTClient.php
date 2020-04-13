@@ -53,7 +53,7 @@ class MQTTClient
             'protocol_level' => 4,
             'clean_session' => $clean ? 0 : 1,
             'client_id' => $this->config['client_id'],
-            'keepalive' => $config['keepalive'] ?? 0,
+            'keepalive' => $this->config['keepalive'] ?? 0,
         ];
         if (isset($this->config['username'])) {
             $data['username'] = $this->config['username'];
