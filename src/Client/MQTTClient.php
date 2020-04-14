@@ -48,7 +48,7 @@ class MQTTClient
     public function connect(bool $clean = true, array $will = [])
     {
         $data = [
-            'cmd' => 1,
+            'cmd' => MQTT::CONNECT, // 1
             'protocol_name' => 'MQTT',
             'protocol_level' => 4,
             'clean_session' => $clean ? 0 : 1,
@@ -76,7 +76,7 @@ class MQTTClient
     public function subscribe(array $topics)
     {
         $data = [
-            'cmd' => 8,
+            'cmd' => MQTT::SUBSCRIBE, // 8
             'message_id' => $this->getMsgId(),
             'topics' => $topics,
         ];
@@ -92,7 +92,7 @@ class MQTTClient
     public function unSubscribe(array $topics)
     {
         $data = [
-            'cmd' => 10,
+            'cmd' => MQTT::UNSUBSCRIBE, // 10
             'message_id' => $this->getMsgId(),
             'topics' => $topics,
         ];
@@ -113,7 +113,7 @@ class MQTTClient
     {
         $response = ($qos > 0) ? true : false;
         return $this->sendBuffer([
-            'cmd' => 3,
+            'cmd' => MQTT::PUBLISH, // 3
             'message_id' => $this->getMsgId(),
             'topic' => $topic,
             'content' => $content,
@@ -138,7 +138,7 @@ class MQTTClient
             $this->reConnect();
             return true;
         }
-        return Mqtt::decode($response);
+        return MQTT::decode($response);
     }
 
     /**
@@ -148,7 +148,7 @@ class MQTTClient
      */
     public function ping()
     {
-        return $this->sendBuffer(['cmd' => 12]);
+        return $this->sendBuffer(['cmd' => MQTT::PINGREQ]); // 12
     }
 
     /**
@@ -158,7 +158,7 @@ class MQTTClient
      */
     public function close()
     {
-        return $this->sendBuffer(['cmd' => 14]);
+        return $this->sendBuffer(['cmd' => MQTT::DISCONNECT]); // 14
     }
 
     /**
@@ -180,11 +180,11 @@ class MQTTClient
      */
     private function sendBuffer($data, $response = true)
     {
-        $buffer = Mqtt::encode($data);
+        $buffer = MQTT::encode($data);
         $this->client->send($buffer);
         if ($response) {
             $response = $this->client->recv();
-            return Mqtt::decode($response);
+            return MQTT::decode($response);
         }
         return true;
     }
