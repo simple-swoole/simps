@@ -58,31 +58,33 @@ class MqttServer
     {
         try {
             $data = MQTT::decode($data);
-            switch ($data['cmd']) {
-                case MQTT::PINGREQ: // 心跳请求
-                    [$class, $func] = $this->_config['receiveCallbacks'][MQTT::PINGREQ];
-                    $obj = new $class();
-                    if ($obj->{$func}($server, $fd, $fromId, $data)) {
-                        // 返回心跳响应
-                        $server->send($fd, MQTT::getAck(['cmd' => 13]));
-                    }
-                    break;
-                case MQTT::DISCONNECT: // 客户端断开连接
-                    [$class, $func] = $this->_config['receiveCallbacks'][MQTT::DISCONNECT];
-                    $obj = new $class();
-                    if ($obj->{$func}($server, $fd, $fromId, $data)) {
-                        $server->send($fd, MQTT::getAck(['cmd' => 14]));
-                        $server->close($fd);
-                    }
-                    break;
-                case MQTT::CONNECT: //连接
-                case MQTT::PUBLISH: // 发布消息
-                case MQTT::SUBSCRIBE: // 订阅
-                case MQTT::UNSUBSCRIBE: // 取消订阅
-                    [$class, $func] = $this->_config['receiveCallbacks'][$data['cmd']];
-                    $obj = new $class();
-                    $obj->{$func}($server, $fd, $fromId, $data);
-                    break;
+            if (is_array($data) && isset($data['cmd'])) {
+                switch ($data['cmd']) {
+                    case MQTT::PINGREQ: // 心跳请求
+                        [$class, $func] = $this->_config['receiveCallbacks'][MQTT::PINGREQ];
+                        $obj = new $class();
+                        if ($obj->{$func}($server, $fd, $fromId, $data)) {
+                            // 返回心跳响应
+                            $server->send($fd, MQTT::getAck(['cmd' => 13]));
+                        }
+                        break;
+                    case MQTT::DISCONNECT: // 客户端断开连接
+                        [$class, $func] = $this->_config['receiveCallbacks'][MQTT::DISCONNECT];
+                        $obj = new $class();
+                        if ($obj->{$func}($server, $fd, $fromId, $data)) {
+                            $server->send($fd, MQTT::getAck(['cmd' => 14]));
+                            $server->close($fd);
+                        }
+                        break;
+                    case MQTT::CONNECT: //连接
+                    case MQTT::PUBLISH: // 发布消息
+                    case MQTT::SUBSCRIBE: // 订阅
+                    case MQTT::UNSUBSCRIBE: // 取消订阅
+                        [$class, $func] = $this->_config['receiveCallbacks'][$data['cmd']];
+                        $obj = new $class();
+                        $obj->{$func}($server, $fd, $fromId, $data);
+                        break;
+                }
             }
         } catch (\Exception $e) {
             $server->close($fd);

@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace  Simps\Server\Protocol;
 
+use RuntimeException;
+
 class MQTT
 {
     const CONNECT = 1; // 客户端到服务端 客户端请求连接服务端
@@ -374,7 +376,7 @@ class MQTT
         $tmp = unpack('n', $buffer);
         $length = $tmp[1];
         if ($length + 2 > strlen($buffer)) {
-            echo 'buffer:' . bin2hex($buffer) . " lenth:{$length} not enough for unpackString\n";
+            throw new RuntimeException('buffer:' . bin2hex($buffer) . " length:{$length} not enough for unpackString");
         }
 
         $string = substr($buffer, 2, $length);
