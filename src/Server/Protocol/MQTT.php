@@ -376,7 +376,8 @@ class MQTT
         $tmp = unpack('n', $buffer);
         $length = $tmp[1];
         if ($length + 2 > strlen($buffer)) {
-            throw new RuntimeException('buffer:' . bin2hex($buffer) . " length:{$length} not enough for unpackString");
+//            throw new RuntimeException('buffer:' . bin2hex($buffer) . " length:{$length} not enough for unpackString");
+            return '';
         }
 
         $string = substr($buffer, 2, $length);
