@@ -1,6 +1,6 @@
 {
     "name": "simple-swoole/simps",
-    "description": "A swoole-based coroutine framework, simple and powerful.",
+    "description": "A simple, lightweight and high-performance PHP coroutine framework.",
     "type": "library",
     "license": "Apache-2.0",
     "keywords": [
