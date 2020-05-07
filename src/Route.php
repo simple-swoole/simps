@@ -30,7 +30,7 @@ class Route
         if (is_null(self::$instance)) {
             self::$instance = new self();
 
-            self::$config = Config::getInstance()->get('routes');
+            self::$config = Config::getInstance()->get('routes', []);
             self::$dispatcher = simpleDispatcher(
                 function (\FastRoute\RouteCollector $routerCollector) {
                     foreach (self::$config as $routerDefine) {
