@@ -178,7 +178,7 @@ class MQTTClient
      * @param bool $response 需要响应
      * @return mixed
      */
-    private function sendBuffer($data, $response = true)
+    public function sendBuffer($data, $response = true)
     {
         $buffer = MQTT::encode($data);
         $this->client->send($buffer);
