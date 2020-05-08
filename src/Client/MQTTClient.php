@@ -158,7 +158,7 @@ class MQTTClient
      */
     public function close()
     {
-        return $this->sendBuffer(['cmd' => MQTT::DISCONNECT]); // 14
+        return $this->sendBuffer(['cmd' => MQTT::DISCONNECT], false); // 14
     }
 
     /**
