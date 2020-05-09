@@ -13,6 +13,19 @@ namespace  Simps\Server\Protocol;
 
 use RuntimeException;
 
+/**
+ * Mqtt Protocol.
+ *
+ * Licensed under The MIT License
+ * For full copyright and license information, please see https://github.com/walkor/Workerman/blob/master/MIT-LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ */
+
+/**
+ * Class MQTT.
+ *
+ * Modified from https://github.com/walkor/mqtt/blob/master/src/Protocols/Mqtt.php
+ */
 class MQTT
 {
     const CONNECT = 1; // 客户端到服务端 客户端请求连接服务端
