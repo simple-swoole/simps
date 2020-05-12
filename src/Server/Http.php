@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Simps\Server;
 
 use Simps\Application;
+use Simps\Context;
 use Simps\Listener;
 use Simps\Route;
 use Simps\Server\Protocol\HTTP\SimpleRoute;
@@ -87,6 +88,8 @@ class Http
 
     public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
     {
+        Context::set('SwRequest', $request);
+        Context::set('SwResponse', $response);
         $this->_route->dispatch($request, $response);
     }
 
