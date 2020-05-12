@@ -120,7 +120,7 @@ class Route
                 return (new $className())->index($request, $response);
             }
             $response->status(404);
-            throw new RuntimeException('The default route index/index class does not exist', 404);
+            throw new RuntimeException('The default router index/index class does not exist', 404);
         }
         $response->status(404);
         throw new RuntimeException('Router Not Found', 404);

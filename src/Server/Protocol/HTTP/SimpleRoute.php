@@ -134,7 +134,7 @@ class SimpleRoute
                 return (new $className())->index($server, $fd);
             }
             $server->send($fd, SimpleResponse::build('', 404));
-            throw new RuntimeException('The default route index/index class does not exist', 404);
+            throw new RuntimeException('The default router index/index class does not exist', 404);
         }
         $server->send($fd, SimpleResponse::build('', 404));
         throw new RuntimeException('Router Not Found', 404);
