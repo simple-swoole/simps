@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Simps;
 
+use FastRoute\Dispatcher;
+use RuntimeException;
 use function FastRoute\simpleDispatcher;
 
 class Route
@@ -54,60 +56,46 @@ class Route
         $uri = $request->server['request_uri'] ?? '/';
         $routeInfo = self::$dispatcher->dispatch($method, $uri);
 
-        //result status decide
         switch ($routeInfo[0]) {
-            case \FastRoute\Dispatcher::NOT_FOUND:
-                // ... 404 Not Found
-                //try default router
+            case Dispatcher::NOT_FOUND:
                 return $this->defaultRouter($request, $response, $uri);
                 break;
-            case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-                //$allowedMethods = $routeInfo[1];
-                // ... 405 Method Not Allowed
+            case Dispatcher::METHOD_NOT_ALLOWED:
                 $response->status(405);
-                throw new \Exception('Request Method Not Allowed', 405);
+                throw new RuntimeException('Request Method Not Allowed', 405);
                 break;
-            case \FastRoute\Dispatcher::FOUND:
+            case Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
-                //string rule is controllerName@functionName
                 if (is_string($handler)) {
-                    //decode handle setting
                     $handler = explode('@', $handler);
                     if (count($handler) != 2) {
-                        throw new \Exception(
-                            'Router Config error on handle.Handle only support two parameter with @' . $uri,
-                            -105
-                        );
+                        throw new RuntimeException("Router {$uri} config error, Only @ are supported");
                     }
 
                     $className = $handler[0];
                     $func = $handler[1];
 
-                    //class check
                     if (! class_exists($className)) {
-                        throw new \Exception("Router {$uri} Handle definded Class Not Found", -106);
+                        throw new RuntimeException("Router {$uri} defined Class Not Found");
                     }
 
-                    //new controller
                     $controller = new $className();
 
-                    //method check
                     if (! method_exists($controller, $func)) {
-                        throw new \Exception("Router {$uri} Handle definded {$func} Method Not Found", -107);
+                        throw new RuntimeException("Router {$uri} defined {$func} Method Not Found");
                     }
 
-                    //invoke controller and get result
                     return $controller->{$func}($request, $response, $vars ?? null);
                 }
                 if (is_callable($handler)) {
-                    //call direct when router define an callable function
                     return call_user_func_array($handler, [$request, $response, $vars ?? null]);
                 }
-                throw new \Exception('Router Config error on handle.' . $uri, -108);
+
+                throw new RuntimeException("Router {$uri} config error");
                 break;
         }
-        throw new \Exception('Unknow Fast Router decide ' . $uri, -101);
+        throw new RuntimeException("Undefined router {$uri}");
     }
 
     /**
@@ -120,7 +108,7 @@ class Route
     public function defaultRouter($request, $response, $uri)
     {
         if (empty($uri)) {
-            throw new \Exception('uri is empty', -111);
+            throw new RuntimeException('uri is empty');
         }
 
         $uri = trim($uri, '/');
@@ -129,14 +117,12 @@ class Route
         if ($uri[0] === '') {
             $className = '\\App\\Controller\\IndexController';
             if (class_exists($className) && method_exists($className, 'index')) {
-                return $className->index($request, $response);
+                return (new $className())->index($request, $response);
             }
-            //找不到404
             $response->status(404);
-            throw new \Exception('Default Router index/index Handle define Class Not Found', 404);
+            throw new RuntimeException('The default route index/index class does not exist', 404);
         }
-
         $response->status(404);
-        throw new \Exception('Router Not Found', 404);
+        throw new RuntimeException('Router Not Found', 404);
     }
 }
