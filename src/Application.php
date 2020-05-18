@@ -66,13 +66,16 @@ EOL;
             case 'mqtt':
                 $className = \Simps\Server\MqttServer::class;
                 break;
+            case 'main':
+                $className = \Simps\Server\MainServer::class;
+                break;
             default:
                 // 用户自定义server
-                $configs = config("servers", []);
-                if(isset($configs[$command[0]]) && isset($configs[$command[0]]['class_name'])) {
+                $configs = config('servers', []);
+                if (isset($configs[$command[0]], $configs[$command[0]]['class_name'])) {
                     $className = $configs[$command[0]]['class_name'];
                 } else {
-                    exit(self::echoError("command $command[0] is not exist, you can use {$argv[0]} [http:start, ws:start, mqtt:start]"));
+                    exit(self::echoError("command {$command[0]} is not exist, you can use {$argv[0]} [http:start, ws:start, mqtt:start, main:start]"));
                 }
         }
         switch ($command[1]) {
@@ -80,7 +83,7 @@ EOL;
                 new $className();
                 break;
             default:
-                self::echoError("use {$argv[0]} [http:start, ws:start, mqtt:start]");
+                self::echoError("use {$argv[0]} [http:start, ws:start, mqtt:start, main:start]");
         }
     }
 }
