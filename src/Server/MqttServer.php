@@ -72,11 +72,12 @@ class MqttServer
                         [$class, $func] = $this->_config['receiveCallbacks'][MQTT::DISCONNECT];
                         $obj = new $class();
                         if ($obj->{$func}($server, $fd, $fromId, $data)) {
-                            $server->send($fd, MQTT::getAck(['cmd' => 14]));
-                            $server->close($fd);
+                            if ($this->_server->exist($fd)) {
+                                $server->close($fd);
+                            }
                         }
                         break;
-                    case MQTT::CONNECT: //连接
+                    case MQTT::CONNECT: // 连接
                     case MQTT::PUBLISH: // 发布消息
                     case MQTT::SUBSCRIBE: // 订阅
                     case MQTT::UNSUBSCRIBE: // 取消订阅
@@ -85,6 +86,8 @@ class MqttServer
                         $obj->{$func}($server, $fd, $fromId, $data);
                         break;
                 }
+            } else {
+                $server->close($fd);
             }
         } catch (\Exception $e) {
             $server->close($fd);
