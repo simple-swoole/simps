@@ -72,7 +72,7 @@ class MqttServer
                         [$class, $func] = $this->_config['receiveCallbacks'][MQTT::DISCONNECT];
                         $obj = new $class();
                         if ($obj->{$func}($server, $fd, $fromId, $data)) {
-                            if ($this->_server->exist($fd)) {
+                            if ($server->exist($fd)) {
                                 $server->close($fd);
                             }
                         }
