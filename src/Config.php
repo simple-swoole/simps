@@ -36,8 +36,7 @@ class Config
      */
     public function get($keys, $default = null)
     {
-        $keys = array_filter(explode('.', strtolower($keys)));
-
+        $keys = explode('.', strtolower($keys));
         if (empty($keys)) {
             return null;
         }
