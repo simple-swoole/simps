@@ -62,7 +62,8 @@ class Route
                 break;
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $response->status(405);
-                throw new RuntimeException('Request Method Not Allowed', 405);
+                return $response->end();
+//                throw new RuntimeException('Request Method Not Allowed', 405);
                 break;
             case Dispatcher::FOUND:
                 $handler = $routeInfo[1];
@@ -107,10 +108,6 @@ class Route
      */
     public function defaultRouter($request, $response, $uri)
     {
-        if (empty($uri)) {
-            throw new RuntimeException('uri is empty');
-        }
-
         $uri = trim($uri, '/');
         $uri = explode('/', $uri);
 
@@ -119,10 +116,10 @@ class Route
             if (class_exists($className) && method_exists($className, 'index')) {
                 return (new $className())->index($request, $response);
             }
-            $response->status(404);
-            throw new RuntimeException('The default router index/index class does not exist', 404);
+//            throw new RuntimeException('The default router index/index class does not exist', 404);
         }
         $response->status(404);
-        throw new RuntimeException('Router Not Found', 404);
+        return $response->end();
+//        throw new RuntimeException('Router Not Found', 404);
     }
 }

@@ -105,8 +105,8 @@ class SimpleRoute
                 return $this->defaultRouter($server, $fd, $uri);
                 break;
             case Dispatcher::METHOD_NOT_ALLOWED:
-                $server->send($fd, SimpleResponse::build('', 405));
-                throw new RuntimeException('Request Method Not Allowed', 405);
+                return $server->send($fd, SimpleResponse::build('', 405));
+//                throw new RuntimeException('Request Method Not Allowed', 405);
                 break;
         }
         throw new RuntimeException("Undefined router {$uri}");
@@ -121,10 +121,6 @@ class SimpleRoute
      */
     public function defaultRouter($server, $fd, $uri)
     {
-        if (empty($uri)) {
-            throw new RuntimeException('uri is empty');
-        }
-
         $uri = trim($uri, '/');
         $uri = explode('/', $uri);
 
@@ -133,10 +129,9 @@ class SimpleRoute
             if (class_exists($className) && method_exists($className, 'index')) {
                 return (new $className())->index($server, $fd);
             }
-            $server->send($fd, SimpleResponse::build('', 404));
-            throw new RuntimeException('The default router index/index class does not exist', 404);
+//            throw new RuntimeException('The default router index/index class does not exist', 404);
         }
-        $server->send($fd, SimpleResponse::build('', 404));
-        throw new RuntimeException('Router Not Found', 404);
+        return $server->send($fd, SimpleResponse::build('', 404));
+//        throw new RuntimeException('Router Not Found', 404);
     }
 }
