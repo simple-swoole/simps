@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://simps.io" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/sy-records/staticfile@master/images/simps.png" alt="Simps" />
+        <img src="https://cdn.jsdelivr.net/gh/sy-records/staticfile@master/images/simps.png" alt="Simps" height="200px" />
     </a>
 </p>
 
