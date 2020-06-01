@@ -20,3 +20,27 @@
 Benchmark testing performance ranking ahead of web frameworks in Java, Go, Python and other languages.
 
 See [https://github.com/the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks#results)
+
+
+## Support Features
+
+* [x] HTTP Server
+* [x] WebSocket Server
+* [x] TCP Server
+* [x] UDP Server
+* [x] MQTT Server/Client
+
+## Contribution
+
+Your contribution to Simps development is very welcome!
+
+You may contribute in the following ways:
+
+* [Report issues and feedback](https://github.com/simple-swoole/simps/issues)
+* Submit fixes, features via Pull Request
+* Write/polish documentation
+
+## Contributors
+
+This project exists thanks to all the people who contribute. [[Contributors](https://github.com/simple-swoole/simps/graphs/contributors)].
+<a href="https://github.com/simple-swoole/simps/graphs/contributors"><img src="https://opencollective.com/simps/contributors.svg?width=890" /></a>
