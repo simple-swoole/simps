@@ -21,7 +21,6 @@ Benchmark testing performance ranking ahead of web frameworks in Java, Go, Pytho
 
 See [https://github.com/the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks#results)
 
-
 ## Support Features
 
 * [x] HTTP Server
