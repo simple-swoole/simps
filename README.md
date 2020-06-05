@@ -42,4 +42,4 @@ You may contribute in the following ways:
 ## Contributors
 
 This project exists thanks to all the people who contribute. [[Contributors](https://github.com/simple-swoole/simps/graphs/contributors)].
-<a href="https://github.com/simple-swoole/simps/graphs/contributors"><img src="https://opencollective.com/simps/contributors.svg?width=890" /></a>
+<a href="https://github.com/simple-swoole/simps/graphs/contributors"><img src="https://opencollective.com/simps/contributors.svg?width=890&button=false" /></a>

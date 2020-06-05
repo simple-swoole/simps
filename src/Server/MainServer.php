@@ -34,6 +34,13 @@ class MainServer
             $this->_server->on($eventKey, [$class, $func]);
         }
 
+        if (isset($this->_config['process']) && ! empty($this->_config['process'])) {
+            foreach ($this->_config['process'] as $processItem) {
+                [$class, $func] = $processItem;
+                $this->_server->addProcess($class::$func($this->_server));
+            }
+        }
+
         if (isset($this->_config['sub']) && ! empty($this->_config['sub'])) {
             foreach ($this->_config['sub'] as $item) {
                 $sub_server = $this->_server->addListener($item['ip'], $item['port'], $item['sock_type'] ?? SWOOLE_SOCK_TCP);
