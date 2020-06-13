@@ -71,20 +71,20 @@ class Route
                 if (is_string($handler)) {
                     $handler = explode('@', $handler);
                     if (count($handler) != 2) {
-                        throw new RuntimeException("Router {$uri} config error, Only @ are supported");
+                        throw new RuntimeException("Route {$uri} config error, Only @ are supported");
                     }
 
                     $className = $handler[0];
                     $func = $handler[1];
 
                     if (! class_exists($className)) {
-                        throw new RuntimeException("Router {$uri} defined Class Not Found");
+                        throw new RuntimeException("Route {$uri} defined '{$className}' Class Not Found");
                     }
 
                     $controller = new $className();
 
                     if (! method_exists($controller, $func)) {
-                        throw new RuntimeException("Router {$uri} defined {$func} Method Not Found");
+                        throw new RuntimeException("Route {$uri} defined '{$func}' Method Not Found");
                     }
 
                     return $controller->{$func}($request, $response, $vars ?? null);
@@ -93,10 +93,10 @@ class Route
                     return call_user_func_array($handler, [$request, $response, $vars ?? null]);
                 }
 
-                throw new RuntimeException("Router {$uri} config error");
+                throw new RuntimeException("Route {$uri} config error");
                 break;
         }
-        throw new RuntimeException("Undefined router {$uri}");
+        throw new RuntimeException("Undefined Route {$uri}");
     }
 
     /**
@@ -116,10 +116,10 @@ class Route
             if (class_exists($className) && method_exists($className, 'index')) {
                 return (new $className())->index($request, $response);
             }
-//            throw new RuntimeException('The default router index/index class does not exist', 404);
+//            throw new RuntimeException('The default route index/index class does not exist', 404);
         }
         $response->status(404);
         return $response->end();
-//        throw new RuntimeException('Router Not Found', 404);
+//        throw new RuntimeException('Route Not Found', 404);
     }
 }
