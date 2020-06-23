@@ -134,7 +134,8 @@ class MQTTClient
         if ($response === false) {
             return true;
         }
-        if ($response === '') { //已断线，需要进行重连
+        // 已断线，需要进行重连
+        if ($response === '' || $response === null) {
             $this->reConnect();
             return true;
         }
