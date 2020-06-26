@@ -77,13 +77,12 @@ class MQTT
     /**
      * 打包Mqtt数据包.
      *
-     * @param array $data
      * @return string
      */
-    public static function encode($data)
+    public static function encode(array $data)
     {
         $cmd = $data['cmd'];
-        switch ($data['cmd']) {
+        switch ($cmd) {
             // ['cmd'=>1, 'clean_session'=>x, 'will'=>['qos'=>x, 'retain'=>x, 'topic'=>x, 'content'=>x],'username'=>x, 'password'=>x, 'keepalive'=>x, 'protocol_name'=>x, 'protocol_level'=>x, 'client_id' => x]
             case static::CONNECT:
                 $body = self::packString($data['protocol_name']) . chr($data['protocol_level']);

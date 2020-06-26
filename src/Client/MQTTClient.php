@@ -28,10 +28,13 @@ class MQTTClient
      *
      * @throws \Exception
      */
-    public function __construct(array $config)
+    public function __construct(array $config, array $swConfig = [])
     {
         $this->config = $config;
         $this->client = new Client(SWOOLE_SOCK_TCP);
+        if (! empty($swConfig)) {
+            $this->client->set($swConfig);
+        }
         if (! $this->client->connect($this->config['host'], $this->config['port'], $this->config['time_out'])) {
             //尝试重连
             $this->reConnect();
