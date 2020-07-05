@@ -63,8 +63,7 @@ class SimpleRoute
         $routeInfo = self::$dispatcher->dispatch($method, $uri);
 
         switch ($routeInfo[0]) {
-            // Dispatcher::FOUND
-            case 1:
+            case Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
 
