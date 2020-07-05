@@ -108,6 +108,8 @@ class SimpleRoute
                 return $server->send($fd, SimpleResponse::build('', 405));
 //                throw new RuntimeException('Request Method Not Allowed', 405);
                 break;
+            default:
+                return $server->send($fd, SimpleResponse::build('', 400));
         }
         throw new RuntimeException("Undefined Route {$uri}");
     }

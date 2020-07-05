@@ -95,6 +95,9 @@ class Route
 
                 throw new RuntimeException("Route {$uri} config error");
                 break;
+            default:
+                $response->status(400);
+                return $response->end();
         }
         throw new RuntimeException("Undefined Route {$uri}");
     }
