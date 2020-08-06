@@ -13,6 +13,7 @@ English | [中文](./README-CN.md)
 [![Contact Simps Team](https://img.shields.io/badge/contact-@Simps%20Team-blue.svg)](mailto:team@simps.io)
 [![PHP Version](https://img.shields.io/badge/php-%3E=7.1-brightgreen.svg)](https://www.php.net)
 [![Swoole Version](https://img.shields.io/badge/swoole-%3E=4.4.0-brightgreen.svg)](https://github.com/swoole/swoole-src)
+[![Join Discord community and chat about Simps](https://img.shields.io/discord/740738911625674872.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&cacheSeconds=60)](https://discord.gg/u4YAqeh)
 
 🚀 A simple, lightweight and high-performance PHP coroutine framework.
 
