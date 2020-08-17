@@ -8,10 +8,12 @@ declare(strict_types=1);
  * @document https://doc.simps.io
  * @license  https://github.com/simple-swoole/simps/blob/master/LICENSE
  */
-
 namespace Simps\Server\Protocol;
 
 use RuntimeException;
+use Simps\Exception\Protocol\MQTTException;
+use Throwable;
+use TypeError;
 
 /**
  * Mqtt Protocol.
@@ -202,118 +204,125 @@ class MQTT
      */
     public static function decode($buffer)
     {
-        $cmd = static::getCmd($buffer); //获取消息类型
-        $body = static::getBody($buffer); //获取消息体
-        switch ($cmd) {
-            case static::CONNECT:
-                $protocolName = static::readString($body);
-                $protocolLevel = ord($body[0]);
-                $cleanSession = ord($body[1]) >> 1 & 0x1;
-                $willFlag = ord($body[1]) >> 2 & 0x1;
-                $willQos = ord($body[1]) >> 3 & 0x3;
-                $willRetain = ord($body[1]) >> 5 & 0x1;
-                $passwordFlag = ord($body[1]) >> 6 & 0x1;
-                $usernameFlag = ord($body[1]) >> 7 & 0x1;
-                $body = substr($body, 2);
-                $tmp = unpack('n', $body);
-                $keepalive = $tmp[1];
-                $body = substr($body, 2);
-                $clientId = static::readString($body);
-                if ($willFlag) {
-                    $willTopic = static::readString($body);
-                    $willContent = static::readString($body);
-                }
-                $username = $password = '';
-                if ($usernameFlag) {
-                    $username = static::readString($body);
-                }
-                if ($passwordFlag) {
-                    $password = static::readString($body);
-                }
-                // ['cmd'=>1, 'clean_session'=>x, 'will'=>['qos'=>x, 'retain'=>x, 'topic'=>x, 'content'=>x],'username'=>x, 'password'=>x, 'keepalive'=>x, 'protocol_name'=>x, 'protocol_level'=>x, 'client_id' => x]
-                $package = [
-                    'cmd' => $cmd,
-                    'protocol_name' => $protocolName,
-                    'protocol_level' => $protocolLevel,
-                    'clean_session' => $cleanSession,
-                    'will' => [],
-                    'username' => $username,
-                    'password' => $password,
-                    'keepalive' => $keepalive,
-                    'client_id' => $clientId,
-                ];
-                if ($willFlag) {
-                    $package['will'] = [
-                        'qos' => $willQos,
-                        'retain' => $willRetain,
-                        'topic' => $willTopic,
-                        'content' => $willContent,
+        try {
+            $cmd = static::getCmd($buffer); //获取消息类型
+            $body = static::getBody($buffer); //获取消息体
+            switch ($cmd) {
+                case static::CONNECT:
+                    $protocolName = static::readString($body);
+                    $protocolLevel = ord($body[0]);
+                    $cleanSession = ord($body[1]) >> 1 & 0x1;
+                    $willFlag = ord($body[1]) >> 2 & 0x1;
+                    $willQos = ord($body[1]) >> 3 & 0x3;
+                    $willRetain = ord($body[1]) >> 5 & 0x1;
+                    $passwordFlag = ord($body[1]) >> 6 & 0x1;
+                    $usernameFlag = ord($body[1]) >> 7 & 0x1;
+                    $body = substr($body, 2);
+                    $tmp = unpack('n', $body);
+                    $keepalive = $tmp[1];
+                    $body = substr($body, 2);
+                    $clientId = static::readString($body);
+                    if ($willFlag) {
+                        $willTopic = static::readString($body);
+                        $willContent = static::readString($body);
+                    }
+                    $username = $password = '';
+                    if ($usernameFlag) {
+                        $username = static::readString($body);
+                    }
+                    if ($passwordFlag) {
+                        $password = static::readString($body);
+                    }
+                    // ['cmd'=>1, 'clean_session'=>x, 'will'=>['qos'=>x, 'retain'=>x, 'topic'=>x, 'content'=>x],'username'=>x, 'password'=>x, 'keepalive'=>x, 'protocol_name'=>x, 'protocol_level'=>x, 'client_id' => x]
+                    $package = [
+                        'cmd' => $cmd,
+                        'protocol_name' => $protocolName,
+                        'protocol_level' => $protocolLevel,
+                        'clean_session' => $cleanSession,
+                        'will' => [],
+                        'username' => $username,
+                        'password' => $password,
+                        'keepalive' => $keepalive,
+                        'client_id' => $clientId,
                     ];
-                } else {
-                    unset($package['will']);
-                }
-                return $package;
-            case static::CONNACK:
-                $sessionPresent = ord($body[0]) & 0x01;
-                $code = ord($body[1]);
-                return ['cmd' => $cmd, 'session_present' => $sessionPresent, 'code' => $code];
-            case static::PUBLISH:
-                $dup = ord($buffer[0]) >> 3 & 0x1;
-                $qos = ord($buffer[0]) >> 1 & 0x3;
-                $retain = ord($buffer[0]) & 0x1;
-                $topic = static::readString($body);
-                if ($qos) {
+                    if ($willFlag) {
+                        $package['will'] = [
+                            'qos' => $willQos,
+                            'retain' => $willRetain,
+                            'topic' => $willTopic,
+                            'content' => $willContent,
+                        ];
+                    } else {
+                        unset($package['will']);
+                    }
+                    return $package;
+                case static::CONNACK:
+                    $sessionPresent = ord($body[0]) & 0x01;
+                    $code = ord($body[1]);
+                    return ['cmd' => $cmd, 'session_present' => $sessionPresent, 'code' => $code];
+                case static::PUBLISH:
+                    $dup = ord($buffer[0]) >> 3 & 0x1;
+                    $qos = ord($buffer[0]) >> 1 & 0x3;
+                    $retain = ord($buffer[0]) & 0x1;
+                    $topic = static::readString($body);
+                    if ($qos) {
+                        $messageId = static::readShortInt($body);
+                    }
+                    $package = [
+                        'cmd' => $cmd,
+                        'topic' => $topic,
+                        'content' => $body,
+                        'dup' => $dup,
+                        'qos' => $qos,
+                        'retain' => $retain,
+                    ];
+                    if ($qos) {
+                        $package['message_id'] = $messageId;
+                    }
+                    return $package;
+                case static::PUBACK:
+                case static::PUBREC:
+                case static::PUBREL:
+                case static::PUBCOMP:
                     $messageId = static::readShortInt($body);
-                }
-                $package = [
-                    'cmd' => $cmd,
-                    'topic' => $topic,
-                    'content' => $body,
-                    'dup' => $dup,
-                    'qos' => $qos,
-                    'retain' => $retain,
-                ];
-                if ($qos) {
-                    $package['message_id'] = $messageId;
-                }
-                return $package;
-            case static::PUBACK:
-            case static::PUBREC:
-            case static::PUBREL:
-            case static::PUBCOMP:
-                $messageId = static::readShortInt($body);
-                return ['cmd' => $cmd, 'message_id' => $messageId];
-            case static::SUBSCRIBE:
-                $messageId = static::readShortInt($body);
-                $topics = [];
-                while ($body) {
-                    $topic = static::readString($body);
-                    $qos = ord($body[0]);
-                    $topics[$topic] = $qos;
-                    $body = substr($body, 1);
-                }
-                return ['cmd' => $cmd, 'message_id' => $messageId, 'topics' => $topics];
-            case static::SUBACK:
-                $messageId = static::readShortInt($body);
-                $tmp = unpack('C*', $body);
-                $codes = array_values($tmp);
-                return ['cmd' => $cmd, 'message_id' => $messageId, 'codes' => $codes];
-            case static::UNSUBSCRIBE:
-                $messageId = static::readShortInt($body);
-                $topics = [];
-                while ($body) {
-                    $topic = static::readString($body);
-                    $topics[] = $topic;
-                }
-                return ['cmd' => $cmd, 'message_id' => $messageId, 'topics' => $topics];
-            case static::UNSUBACK:
-                $messageId = static::readShortInt($body);
-                return ['cmd' => $cmd, 'message_id' => $messageId];
-            case static::PINGREQ:
-            case static::PINGRESP:
-            case static::DISCONNECT:
-                return ['cmd' => $cmd];
+                    return ['cmd' => $cmd, 'message_id' => $messageId];
+                case static::SUBSCRIBE:
+                    $messageId = static::readShortInt($body);
+                    $topics = [];
+                    while ($body) {
+                        $topic = static::readString($body);
+                        $qos = ord($body[0]);
+                        $topics[$topic] = $qos;
+                        $body = substr($body, 1);
+                    }
+                    return ['cmd' => $cmd, 'message_id' => $messageId, 'topics' => $topics];
+                case static::SUBACK:
+                    $messageId = static::readShortInt($body);
+                    $tmp = unpack('C*', $body);
+                    $codes = array_values($tmp);
+                    return ['cmd' => $cmd, 'message_id' => $messageId, 'codes' => $codes];
+                case static::UNSUBSCRIBE:
+                    $messageId = static::readShortInt($body);
+                    $topics = [];
+                    while ($body) {
+                        $topic = static::readString($body);
+                        $topics[] = $topic;
+                    }
+                    return ['cmd' => $cmd, 'message_id' => $messageId, 'topics' => $topics];
+                case static::UNSUBACK:
+                    $messageId = static::readShortInt($body);
+                    return ['cmd' => $cmd, 'message_id' => $messageId];
+                case static::PINGREQ:
+                case static::PINGRESP:
+                case static::DISCONNECT:
+                    return ['cmd' => $cmd];
+            }
+        } catch (TypeError $e) {
+            throw new MQTTException($e->getMessage(), $e->getCode());
+        } catch (Throwable $e) {
+            throw new MQTTException($e->getMessage(), $e->getCode());
         }
+
         return $buffer;
     }
 
