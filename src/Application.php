@@ -15,7 +15,7 @@ class Application
     /**
      * @var string
      */
-    protected static $version = '1.0.3';
+    protected static $version = '1.0.4';
 
     public static function welcome()
     {
