@@ -58,6 +58,14 @@ class Http
             [$class, $func] = $callbackItem;
             $this->_server->on($eventKey, [$class, $func]);
         }
+
+        if (isset($this->_config['process']) && ! empty($this->_config['process'])) {
+            foreach ($this->_config['process'] as $processItem) {
+                [$class, $func] = $processItem;
+                $this->_server->addProcess($class::$func($this->_server));
+            }
+        }
+
         $this->_server->start();
     }
 
