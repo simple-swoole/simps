@@ -10,6 +10,7 @@ declare(strict_types=1);
  */
 namespace Simps\Client;
 
+use Simps\Exception\Protocol\MQTTException;
 use Simps\Server\Protocol\MQTT;
 use Swoole\Coroutine;
 use Swoole\Coroutine\Client;
@@ -18,7 +19,16 @@ class MQTTClient
 {
     private $client;
 
-    private $config = [];
+    private $config = [
+        'host' => '127.0.0.1',
+        'port' => 1883,
+        'time_out' => 0.5,
+        'username' => '',
+        'password' => '',
+        'client_id' => '',
+        'keepalive' => 0,
+        'debug' => false,
+    ];
 
     private $msgId = 0;
 
@@ -29,7 +39,7 @@ class MQTTClient
      */
     public function __construct(array $config, array $swConfig = [])
     {
-        $this->config = $config;
+        $this->config = array_replace_recursive($this->config, $config);
         $this->client = new Client(SWOOLE_SOCK_TCP);
         if (! empty($swConfig)) {
             $this->client->set($swConfig);
@@ -133,15 +143,18 @@ class MQTTClient
     public function recv()
     {
         $response = $this->client->recv();
-        if ($response === false) {
-            return true;
+        if (strlen($response) > 0) {
+            return MQTT::decode($response);
         }
-        // 已断线，需要进行重连
-        if ($response === '' || $response === null) {
+        if ($response === '') {
             $this->reConnect();
-            return true;
+        } elseif ($response === false) {
+            if ($this->client->errCode !== SOCKET_ETIMEDOUT) {
+                throw new MQTTException($this->client->errMsg, $this->client->errCode);
+            }
         }
-        return MQTT::decode($response);
+
+        return true;
     }
 
     /**
@@ -188,6 +201,9 @@ class MQTTClient
         $this->client->send($buffer);
         if ($response) {
             $response = $this->client->recv();
+            if ($this->config['debug']) {
+                MQTT::printStr($response);
+            }
             return MQTT::decode($response);
         }
         return true;
