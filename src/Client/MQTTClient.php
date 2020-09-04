@@ -201,7 +201,7 @@ class MQTTClient
         $this->client->send($buffer);
         if ($response) {
             $response = $this->client->recv();
-            if ($this->config['debug']) {
+            if ($this->config['debug'] && strlen($response) > 0) {
                 MQTT::printStr($response);
             }
             return MQTT::decode($response);
