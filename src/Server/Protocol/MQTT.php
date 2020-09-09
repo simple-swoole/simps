@@ -59,24 +59,6 @@ class MQTT
     const DISCONNECT = 14; // 客户端到服务端 客户端断开连接
 
     /**
-     * 检查包长
-     *
-     * @param string $buffer
-     * @return int
-     */
-    public static function input($buffer)
-    {
-        $length = strlen($buffer);
-        $bodyLength = static::getBodyLength($buffer, $headBytes);
-        $totalLength = $bodyLength + $headBytes;
-        if ($length < $totalLength) {
-            return 0;
-        }
-
-        return $totalLength;
-    }
-
-    /**
      * 打包Mqtt数据包.
      *
      * @return string
@@ -397,8 +379,7 @@ class MQTT
         $tmp = unpack('n', $buffer);
         $length = $tmp[1];
         if ($length + 2 > strlen($buffer)) {
-//            throw new RuntimeException('buffer:' . bin2hex($buffer) . " length:{$length} not enough for unpackString");
-            return '';
+            throw new RuntimeException('buffer:' . bin2hex($buffer) . " length:{$length} not enough for unpackString");
         }
 
         $string = substr($buffer, 2, $length);

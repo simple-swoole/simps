@@ -88,7 +88,7 @@ class MqttServer
             } else {
                 $server->close($fd);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $server->close($fd);
         }
     }
