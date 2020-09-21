@@ -143,15 +143,15 @@ class MQTTClient
     public function recv()
     {
         $response = $this->client->recv();
-        if (strlen($response) > 0) {
-            return MQTT::decode($response);
-        }
+
         if ($response === '') {
             $this->reConnect();
         } elseif ($response === false) {
             if ($this->client->errCode !== SOCKET_ETIMEDOUT) {
                 throw new MQTTException($this->client->errMsg, $this->client->errCode);
             }
+        } elseif (strlen($response) > 0) {
+            return MQTT::decode($response);
         }
 
         return true;
