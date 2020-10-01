@@ -86,7 +86,16 @@ class Route
                         throw new RuntimeException("Route {$uri} defined '{$func}' Method Not Found");
                     }
 
-                    return $controller->{$func}($request, $response, $vars ?? null);
+                    // 在Controller中加入middleware属性，example:$middleware=['method_name'=>['auth','filter']];
+                    $middleware = 'middleware';
+                    $handler = function($request, $response, $vars) use ($controller, $func){
+                        return $controller->{$func}($request, $response, $vars ?? null);
+                    };
+ 
+                    if (property_exists($controller,'middleware') && $middlewares = $controller->{$middleware}[$func] ?? []){
+                        $handler = $this->pack_middleware($handler , $middlewares);
+                    }
+                    return $handler($request, $response, $vars ?? null);
                 }
                 if (is_callable($handler)) {
                     return call_user_func_array($handler, [$request, $response, $vars ?? null]);
@@ -123,5 +132,18 @@ class Route
         $response->status(404);
         return $response->end();
 //        throw new RuntimeException('Route Not Found', 404);
+    }
+
+    /**
+     * @param $handler
+     * @param $middlewares
+     * @return callable
+     */
+    function pack_middleware($handler, $middlewares=[])
+    {
+        foreach($middlewares as $middleware){
+            $handler = $middleware($handler);
+        }
+        return $handler;
     }
 }
