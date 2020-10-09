@@ -87,8 +87,13 @@ class Route
                         return $controller->{$func}($request, $response, $vars ?? null);
                     };
                     $middleware = 'middleware';
-                    if (property_exists($controller, $middleware) && $middlewares = $controller->{$middleware}[$func] ?? []) {
-                        $middlewareHandler = $this->packMiddleware($middlewareHandler, $middlewares);
+                    if (property_exists($controller, $middleware)) {
+                        $classMiddlewares = $controller->{$middleware}['__construct'] ?? [];
+                        $methodMiddlewares = $controller->{$middleware}[$func] ?? [];
+                        $middlewares = array_merge($classMiddlewares, $methodMiddlewares);
+                        if ($middlewares) {
+                            $middlewareHandler = $this->packMiddleware($middlewareHandler, $middlewares);
+                        }
                     }
                     return $middlewareHandler($request, $response, $vars ?? null);
                 }
@@ -126,9 +131,10 @@ class Route
 
     /**
      * @param $handler
+     * @param array $middlewares
      * @return mixed
      */
-    public function packMiddleware($handler, array $middlewares = [])
+    public function packMiddleware($handler, $middlewares = [])
     {
         foreach ($middlewares as $middleware) {
             $handler = $middleware($handler);
