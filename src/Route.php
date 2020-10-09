@@ -47,7 +47,7 @@ class Route
      * @param $request
      * @param $response
      * @throws \Exception
-     * @return mixed|string
+     * @return mixed|void
      */
     public function dispatch($request, $response)
     {
@@ -58,12 +58,9 @@ class Route
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
                 return $this->defaultRouter($request, $response, $uri);
-                break;
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $response->status(405);
                 return $response->end();
-//                throw new RuntimeException('Request Method Not Allowed', 405);
-                break;
             case Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
@@ -86,36 +83,31 @@ class Route
                         throw new RuntimeException("Route {$uri} defined '{$func}' Method Not Found");
                     }
 
-                    // 在Controller中加入middleware属性，example:$middleware=['method_name'=>['auth','filter']];
-                    $middleware = 'middleware';
-                    $handler = function($request, $response, $vars) use ($controller, $func){
+                    $middlewareHandler = function ($request, $response, $vars) use ($controller, $func) {
                         return $controller->{$func}($request, $response, $vars ?? null);
                     };
- 
-                    if (property_exists($controller,'middleware') && $middlewares = $controller->{$middleware}[$func] ?? []){
-                        $handler = $this->pack_middleware($handler , $middlewares);
+                    $middleware = 'middleware';
+                    if (property_exists($controller, $middleware) && $middlewares = $controller->{$middleware}[$func] ?? []) {
+                        $middlewareHandler = $this->packMiddleware($middlewareHandler, $middlewares);
                     }
-                    return $handler($request, $response, $vars ?? null);
+                    return $middlewareHandler($request, $response, $vars ?? null);
                 }
+
                 if (is_callable($handler)) {
                     return call_user_func_array($handler, [$request, $response, $vars ?? null]);
                 }
 
                 throw new RuntimeException("Route {$uri} config error");
-                break;
             default:
                 $response->status(400);
                 return $response->end();
         }
-        throw new RuntimeException("Undefined Route {$uri}");
     }
 
     /**
      * @param $request
      * @param $response
      * @param $uri
-     * @throws \Exception
-     * @return mixed
      */
     public function defaultRouter($request, $response, $uri)
     {
@@ -127,21 +119,18 @@ class Route
             if (class_exists($className) && method_exists($className, 'index')) {
                 return (new $className())->index($request, $response);
             }
-//            throw new RuntimeException('The default route index/index class does not exist', 404);
         }
         $response->status(404);
         return $response->end();
-//        throw new RuntimeException('Route Not Found', 404);
     }
 
     /**
      * @param $handler
-     * @param $middlewares
-     * @return callable
+     * @return mixed
      */
-    function pack_middleware($handler, $middlewares=[])
+    public function packMiddleware($handler, array $middlewares = [])
     {
-        foreach($middlewares as $middleware){
+        foreach ($middlewares as $middleware) {
             $handler = $middleware($handler);
         }
         return $handler;
