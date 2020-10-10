@@ -92,7 +92,7 @@ class Route
                         $methodMiddlewares = $controller->{$middleware}[$func] ?? [];
                         $middlewares = array_merge($classMiddlewares, $methodMiddlewares);
                         if ($middlewares) {
-                            $middlewareHandler = $this->packMiddleware($middlewareHandler, $middlewares);
+                            $middlewareHandler = $this->packMiddleware($middlewareHandler, array_reverse($middlewares));
                         }
                     }
                     return $middlewareHandler($request, $response, $vars ?? null);
