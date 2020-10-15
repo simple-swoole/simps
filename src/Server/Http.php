@@ -32,10 +32,11 @@ class Http
         $config = config('servers');
         $httpConfig = $config['http'];
         $this->_config = $httpConfig;
-        if ($httpConfig['settings']['only_simple_http'] ?? false) {
+        if (isset($httpConfig['settings']['only_simple_http'])) {
             $this->_server = new HttpServer($httpConfig['ip'], $httpConfig['port'], $config['mode']);
             $this->_server->on('workerStart', [$this, 'onSimpleWorkerStart']);
             $this->_server->on('receive', [$this, 'onReceive']);
+            unset($httpConfig['settings']['only_simple_http']);
         } else {
             $this->_server = new Server(
                 $httpConfig['ip'],
