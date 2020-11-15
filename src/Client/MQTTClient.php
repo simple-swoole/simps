@@ -15,6 +15,9 @@ use Simps\Server\Protocol\MQTT;
 use Swoole\Coroutine;
 use Swoole\Coroutine\Client;
 
+/**
+ * @deprecated v1.1 use https://github.com/simps/mqtt instead.
+ */
 class MQTTClient
 {
     private $client;
