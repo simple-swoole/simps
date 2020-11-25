@@ -29,7 +29,7 @@ class MqttServer
         $config = config('servers');
         $mqttConfig = $config['mqtt'];
         $this->_config = $mqttConfig;
-        $this->_server = new Server($mqttConfig['ip'], $mqttConfig['port'], $config['mode']);
+        $this->_server = new Server($mqttConfig['ip'], $mqttConfig['port'], $config['mode'], $mqttConfig['sock_type'] ?? SWOOLE_SOCK_TCP);
         $this->_server->set($mqttConfig['settings']);
 
         $this->_server->on('Start', [$this, 'onStart']);

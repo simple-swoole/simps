@@ -29,7 +29,7 @@ class WebSocket
         $config = config('servers');
         $wsConfig = $config['ws'];
         $this->_config = $wsConfig;
-        $this->_server = new Server($wsConfig['ip'], $wsConfig['port'], $config['mode']);
+        $this->_server = new Server($wsConfig['ip'], $wsConfig['port'], $config['mode'], $wsConfig['sock_type'] ?? SWOOLE_SOCK_TCP);
         $this->_server->set($wsConfig['settings']);
 
         if ($config['mode'] == SWOOLE_BASE) {
