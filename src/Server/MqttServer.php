@@ -27,10 +27,6 @@ class MqttServer
      */
     public function __construct()
     {
-        if (! class_exists(Types::class)) {
-            throw new \RuntimeException('Please execute `composer require simps/mqtt` and then run');
-        }
-
         $config = config('servers');
         $mqttConfig = $config['mqtt'];
         $this->_config = $mqttConfig;

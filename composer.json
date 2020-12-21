@@ -20,10 +20,8 @@
     "require": {
         "php": ">=7.1",
         "ext-swoole": ">=4.4",
-        "nikic/fast-route": "^1.3"
-    },
-    "suggest": {
-        "simps/mqtt": "Required to use MQTT."
+        "nikic/fast-route": "^1.3",
+        "simps/mqtt": "^1.1"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.9"
