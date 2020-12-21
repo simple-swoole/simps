@@ -12,7 +12,8 @@ namespace Simps\Server;
 
 use Simps\Application;
 use Simps\Listener;
-use Simps\Server\Protocol\MQTT;
+use Simps\MQTT\Protocol;
+use Simps\MQTT\Types;
 use Swoole\Server;
 
 class MqttServer
@@ -26,6 +27,10 @@ class MqttServer
      */
     public function __construct()
     {
+        if (! class_exists(Types::class)) {
+            throw new \RuntimeException('Please execute `composer require simps/mqtt` and then run');
+        }
+
         $config = config('servers');
         $mqttConfig = $config['mqtt'];
         $this->_config = $mqttConfig;
@@ -56,19 +61,19 @@ class MqttServer
     public function onReceive($server, $fd, $fromId, $data)
     {
         try {
-            $data = MQTT::decode($data);
-            if (is_array($data) && isset($data['cmd'])) {
-                switch ($data['cmd']) {
-                    case MQTT::PINGREQ: // 心跳请求
-                        [$class, $func] = $this->_config['receiveCallbacks'][MQTT::PINGREQ];
+            $data = Protocol::unpack($data);
+            if (is_array($data) && isset($data['type'])) {
+                switch ($data['type']) {
+                    case Types::PINGREQ: // 心跳请求
+                        [$class, $func] = $this->_config['receiveCallbacks'][Types::PINGREQ];
                         $obj = new $class();
                         if ($obj->{$func}($server, $fd, $fromId, $data)) {
                             // 返回心跳响应
-                            $server->send($fd, MQTT::getAck(['cmd' => 13]));
+                            $server->send($fd, Protocol::pack(['type' => Types::PINGRESP]));
                         }
                         break;
-                    case MQTT::DISCONNECT: // 客户端断开连接
-                        [$class, $func] = $this->_config['receiveCallbacks'][MQTT::DISCONNECT];
+                    case Types::DISCONNECT: // 客户端断开连接
+                        [$class, $func] = $this->_config['receiveCallbacks'][Types::DISCONNECT];
                         $obj = new $class();
                         if ($obj->{$func}($server, $fd, $fromId, $data)) {
                             if ($server->exist($fd)) {
@@ -76,11 +81,11 @@ class MqttServer
                             }
                         }
                         break;
-                    case MQTT::CONNECT: // 连接
-                    case MQTT::PUBLISH: // 发布消息
-                    case MQTT::SUBSCRIBE: // 订阅
-                    case MQTT::UNSUBSCRIBE: // 取消订阅
-                        [$class, $func] = $this->_config['receiveCallbacks'][$data['cmd']];
+                    case Types::CONNECT: // 连接
+                    case Types::PUBLISH: // 发布消息
+                    case Types::SUBSCRIBE: // 订阅
+                    case Types::UNSUBSCRIBE: // 取消订阅
+                        [$class, $func] = $this->_config['receiveCallbacks'][$data['type']];
                         $obj = new $class();
                         $obj->{$func}($server, $fd, $fromId, $data);
                         break;
