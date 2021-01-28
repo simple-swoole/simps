@@ -2,7 +2,7 @@ English | [中文](./README-CN.md)
 
 <p align="center">
     <a href="https://simps.io" target="_blank">
-        <img src="https://cdn.jsdelivr.net/gh/sy-records/staticfile@master/images/simps.png" alt="Simps" height="200px" />
+        <img src="https://cdn.jsdelivr.net/gh/sy-records/staticfile/images/simps.png" alt="Simps" height="200px" />
     </a>
 </p>
 
@@ -21,7 +21,7 @@ English | [中文](./README-CN.md)
 
 Benchmark testing performance ranking ahead of web frameworks in Java, Go, Python and other languages.
 
-See [https://github.com/the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks#results)
+See [https://github.com/the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks/blob/8543e5dac6eb7f56308db278b4310beb80b0444d/README.md#results)
 
 ## Support Features
 
@@ -29,7 +29,7 @@ See [https://github.com/the-benchmarker/web-frameworks](https://github.com/the-b
 * [x] WebSocket Server
 * [x] TCP Server
 * [x] UDP Server
-* [x] MQTT Server/Client
+* [x] MQTT Server/[Client](https://github.com/simps/mqtt)
 
 ## Documentation
 
