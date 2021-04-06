@@ -20,3 +20,21 @@ if (! function_exists('config')) {
         return getInstance('\Simps\Config')->get($name, $default);
     }
 }
+if (! function_exists('container')) {
+    function container($key = null, $value = null)
+    {
+        if ($key == null) {
+            return \Simps\Utils\Container::instance();
+        }
+        if ($value == null) {
+            return \Simps\Utils\Container::instance()->singleton($key);
+        }
+        return \Simps\Utils\Container::instance()->set($key, $value);
+    }
+}
+if (! function_exists('collection')) {
+    function collection($data = [])
+    {
+        return new \Simps\Utils\Collection($data);
+    }
+}
