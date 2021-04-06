@@ -12,7 +12,7 @@ namespace Simps\Server\Protocol\HTTP;
 
 use FastRoute\Dispatcher;
 use RuntimeException;
-use Simps\Config;
+use Simps\Utils\Config;
 use function FastRoute\simpleDispatcher;
 
 class SimpleRoute

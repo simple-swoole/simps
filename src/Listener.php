@@ -10,6 +10,8 @@ declare(strict_types=1);
  */
 namespace Simps;
 
+use Simps\Utils\Config;
+
 class Listener
 {
     private static $instance;
