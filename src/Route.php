@@ -12,6 +12,7 @@ namespace Simps;
 
 use FastRoute\Dispatcher;
 use RuntimeException;
+use Simps\Utils\Config;
 use function FastRoute\simpleDispatcher;
 
 class Route
