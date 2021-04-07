@@ -10,12 +10,27 @@ declare(strict_types=1);
  */
 namespace Simps;
 
+use Simps\Console\Command;
+use Simps\Utils\Env;
+use Swoole\Coroutine;
+
 class Application
 {
     /**
      * @var string
      */
-    protected static $version = '1.0.5';
+    protected static $version = '2.0.0-dev';
+
+    protected $console = [
+        // Server相关
+        \Simps\Console\Server\StatusCommand::class,
+        \Simps\Console\Server\StartCommand::class,
+        \Simps\Console\Server\StopCommand::class,
+        \Simps\Console\Server\RestartCommand::class,
+
+        // 其他命令
+        \Simps\Console\Other\HelpCommand::class,
+    ];
 
     public static function welcome()
     {
@@ -48,41 +63,40 @@ EOL;
         self::println('[' . date('Y-m-d H:i:s') . '] [ERROR] ' . "\033[31m{$msg}\033[0m");
     }
 
-    public static function run()
+    /**
+     * @return string[]
+     */
+    public function getConsole()
     {
+        return $this->console;
+    }
+
+    public function start()
+    {
+        // 初始化环境变量
+        container(Env::class);
+        // 获取所有命令
+        $this->console = array_merge($this->console, config('console', []));
+
         self::welcome();
         global $argv;
-        $count = count($argv);
-        $funcName = $argv[$count - 1];
-        $command = explode(':', $funcName);
-        switch ($command[0]) {
-            case 'http':
-                $className = \Simps\Server\Http::class;
-                break;
-            case 'ws':
-                $className = \Simps\Server\WebSocket::class;
-                break;
-            case 'mqtt':
-                $className = \Simps\Server\MqttServer::class;
-                break;
-            case 'main':
-                $className = \Simps\Server\MainServer::class;
-                break;
-            default:
-                // 用户自定义server
-                $configs = config('servers', []);
-                if (isset($configs[$command[0]], $configs[$command[0]]['class_name'])) {
-                    $className = $configs[$command[0]]['class_name'];
-                } else {
-                    exit(self::echoError("command {$command[0]} is not exist, you can use {$argv[0]} [http:start, ws:start, mqtt:start, main:start]"));
+        $command = $argv[1] ?? 'help';
+        $params = isset($argv[2]) ? array_slice($argv, 2) : [];
+        foreach ($this->console as $cls) {
+            $obj = new $cls($this, $params);
+            if ($obj instanceof Command) {
+                if ($command == $obj->getCommand()) {
+                    if ($obj->getCoroutine()) {
+                        Coroutine\run(function () use ($obj) {
+                            $obj->handle();
+                        });
+                    } else {
+                        $obj->handle();
+                    }
+                    return;
                 }
+            }
         }
-        switch ($command[1]) {
-            case 'start':
-                new $className();
-                break;
-            default:
-                self::echoError("use {$argv[0]} [http:start, ws:start, mqtt:start, main:start]");
-        }
+        self::echoError("Command `{$command}` not found");
     }
 }
