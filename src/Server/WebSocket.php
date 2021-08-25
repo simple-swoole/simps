@@ -17,7 +17,7 @@ use Swoole\WebSocket\Server;
 
 class WebSocket
 {
-    protected $_server;
+    public $_server;
 
     protected $_config;
 
@@ -39,6 +39,7 @@ class WebSocket
         }
 
         $this->_server->on('workerStart', [$this, 'onWorkerStart']);
+        $this->_server->on('request', [$this, 'onRequest']);
 
         foreach ($wsConfig['callbacks'] as $eventKey => $callbackItem) {
             [$class, $func] = $callbackItem;
@@ -51,7 +52,9 @@ class WebSocket
                 $this->_server->addProcess($class::$func($this->_server));
             }
         }
+    }
 
+    public function start(){
         $this->_server->start();
     }
 
@@ -72,4 +75,12 @@ class WebSocket
         $this->_route = Route::getInstance();
         Listener::getInstance()->listen('workerStart', $server, $workerId);
     }
+
+    public function onRequest(\Swoole\Http\Request $request, \Swoole\Http\Response $response)
+    {
+        Context::set('SwRequest', $request);
+        Context::set('SwResponse', $response);
+        $this->_route->dispatch($request, $response);
+    }
+
 }

@@ -12,7 +12,7 @@ namespace Simps\Server;
 
 class MainServer
 {
-    protected $_server;
+    public $_server;
 
     protected $_config;
 
@@ -52,7 +52,9 @@ class MainServer
                 }
             }
         }
+    }
 
+    public function start(){
         $this->_server->start();
     }
 }

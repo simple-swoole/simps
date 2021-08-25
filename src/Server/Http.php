@@ -20,7 +20,7 @@ use Swoole\Server as HttpServer;
 
 class Http
 {
-    protected $_server;
+    public $_server;
 
     protected $_config;
 
@@ -66,7 +66,9 @@ class Http
                 $this->_server->addProcess($class::$func($this->_server));
             }
         }
+    }
 
+    public function start(){
         $this->_server->start();
     }
 
