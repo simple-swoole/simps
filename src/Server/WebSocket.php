@@ -17,7 +17,7 @@ use Swoole\WebSocket\Server;
 
 class WebSocket
 {
-    protected $_server;
+    public $_server;
 
     protected $_config;
 
@@ -51,7 +51,9 @@ class WebSocket
                 $this->_server->addProcess($class::$func($this->_server));
             }
         }
+    }
 
+    public function start(){
         $this->_server->start();
     }
 
@@ -72,4 +74,5 @@ class WebSocket
         $this->_route = Route::getInstance();
         Listener::getInstance()->listen('workerStart', $server, $workerId);
     }
+
 }

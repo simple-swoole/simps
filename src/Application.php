@@ -52,6 +52,7 @@ EOL;
     {
         self::welcome();
         global $argv;
+        global $simps; //make simps and its $_server for global use, such as swoole task
         $count = count($argv);
         $funcName = $argv[$count - 1];
         $command = explode(':', $funcName);
@@ -79,7 +80,8 @@ EOL;
         }
         switch ($command[1]) {
             case 'start':
-                new $className();
+                $simps = new $className();
+                $simps->start();
                 break;
             default:
                 self::echoError("use {$argv[0]} [http:start, ws:start, mqtt:start, main:start]");
