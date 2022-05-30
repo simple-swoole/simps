@@ -11,7 +11,7 @@ declare(strict_types=1);
 namespace Simps\Server;
 
 use Simps\Application;
-use Simps\Context;
+use Simps\Utils\Context;
 use Simps\Listener;
 use Simps\Route;
 use Simps\Server\Protocol\HTTP\SimpleRoute;
